@@ -18,7 +18,7 @@ mosaic_name = '%s_mdis_wac_mos.cub' % (FILTER)
 
 content_re = re.compile(r'(Group.*End_Group)', re.DOTALL)
 def get_pixel_scale(img_name):
-    # special case see git repository
+    # special case
     output = isis.campt.check_output(from_=img_name)
     output = content_re.search(output).group(1) 
     pixel_scale = parse_label(output)['GroundPoint']['SampleResolution']
