@@ -1,96 +1,191 @@
 #!/usr/bin/env python
+from os.path import splitext
 from argparse import ArgumentParser
-from pysis.commands import isis
-from pysis.util import write_file_list, file_variations
-from pysis.labels import parse_file_label, parse_label
+
+from functools import partial
+from multiprocessing import Pool
+
 import yaml
+from pysis import isis
+from pysis import IsisPool
 
-# add Pysis pool and multiple file processing?
-# dictionary literals
+from pysis.util import write_file_list
+from pysis.labels import parse_file_label
 
-def create_yml(img_name):
+class ImageName(str):
+    def __getattr__(self, ext):
+        return ImageName(self + '.' + ext)
+
+    def __repr__(self):
+        return '%s(%r)' %  (self.__class__.__name__, str(self))
+
+def create_yml(image, title):
     """ This function generates a yml file with information.
     Args:
-        img_name
+        image:
+        title:
     """
-
-    label = parse_file_label(img_name)
+    cube = parse_file_label(image.proj.cub)
+    label = cube['IsisCube']
+    print label
     orbit = label['Archive']['OrbitNumber']
     scale = label['Mapping']['PixelResolution']
-    clon  = label['Mapping']['PreciseCenterLongitude']
-    clat  = label['Mapping']['PreciseCenterLatitude']
     time  = label['Instrument']['StartTime'].replace('T',' ')
 
+    isis.campt(from_=image, to=image.campt)
+    label = parse_file_label(image.campt)
+
+    points = label['GroundPoint']
+    clon  = points['PositiveEast360Longitude']
+    clat  = points['PlanetocentricLatitude']
+
     data = {
-        ':release':   'YYYY-MM-DD 10:00:00.00 +00:00',
-        ':title':     'New Title',
-        ':timestamp': '%s +00:00' % time,
-        ':orbit':     orbit,
-        ':clat':      '%.3f&deg;' % clat,
-        ':clon':      '%.3f&deg;' % clon,
-        'resolution': '%.2f m/pixel' % scale,
-        ':mode':      'Native',
-        ':ptif':      '%s.tif' % img_name,
-        ':thumb':     '%s.png' % img_name
+        ':release':    'YYYY-MM-DD 10:00:00.00 +00:00',
+        ':title':      title,
+        ':timestamp':  '%s +00:00' % time,
+        ':orbit':      orbit,
+        ':clat':       '%.3f&deg;' % clat,
+        ':clon':       '%.3f&deg;' % clon,
+        ':resolution': '%.2f m/pixel' % scale['value'],
+        ':mode':       'Native',
+        ':ptif':       str(image.tif),
+        ':thumb':      str(image.png)
     }
 
-    yaml.dump(open(img_name+'.yml', 'w'), data)
+    with open(image.yml, 'w') as yaml_file:
+        yaml.dump(data, yaml_file, default_flow_style=False)
 
+def create_caption(image, caption):
+    template = '<p>%s</p><div>[NASA/GSFC/Arizona State University].</div>'
 
-def create_caption(img_name):
-    textstr = '<p>Short Caption.</p> <div>[NASA/GSFC/Arizona State University].</div>'
-    with open(img_name+'.caption', 'w') as caption_file:
-        caption_file.write(textstr)
+    with open(image.caption, 'w') as caption_file:
+        caption_file.write(template % caption)
 
+def process_images(images, title, caption):
+    """
+        Gets passed "images", with multiple "image"
+        the extensions are called "ext_set"
+        the img_set has the imagename + ext_set
+        look at named tuples for future reference
+    """
+    images = [ImageName(splitext(image)[0]) for image in images]
+    
+    with IsisPool() as isis_pool: 
+        for image in images:
+            isis_pool.lrocnac2isis(from_=image.IMG, to=image.cub)
 
-def get_clatlon(map_file):
-    mapping = parse_file_header(map_file)['Mapping']
-    clon = mapping['CenterLongitude']
-    clat = mapping['CenterLatitude']
-    return clon, clat
+    with IsisPool() as isis_pool: 
+        for image in images:
+            isis_pool.spiceinit(from_=image.cub)
 
+    with IsisPool() as isis_pool: 
+        for image in images:
+            #lronaccal default is IOF calibration
+            isis_pool.lronaccal(from_=image.cub, to=image.cal.cub)
 
-def process_img(img_name):
-    (cub_name, cal_name, trim_name, proj_name) = file_variations(img_name,
-        ['.cub', '.cal.cub', '.trim.cub', '.proj.cub'])
+    with IsisPool() as isis_pool: 
+        for image in images:
+            isis_pool.trim(from_=image.cal.cub, to=image.trim.cub,
+                           left=45, right=45)
 
-    isis.lronac2isis(from_=img_name, to=cub_name)
-    isis.spiceinit(from_=cub_name)
+    with IsisPool() as isis_pool:
+        for image in images:
+            write_file_list(image.map.lis, [image.trim.cub])
+            isis_pool.mosrange(fromlist=image.map.lis,
+                               to=image.nac_eqr.map,
+                               precision=2, projection='equirectangular')
+
+    with IsisPool() as isis_pool: 
+        for image in images:
+            isis_pool.cam2map(from_=image.trim.cub, to=image.proj.cub,
+                              pixres='map', map=image.nac_eqr.map)
+
+    create_yml(image, title)
+    create_caption(image, caption)
+
+def process_image(image, title, caption):
+    image = ImageName(splitext(image)[0])
+    
+    isis.lronac2isis.print_cmd(from_=image.IMG, to=image.cub)
+    isis.lronac2isis(from_=image.IMG, to=image.cub)
+    isis.spiceinit(from_=image.cub)
 
     #lronaccal default is IOF calibration
-    isis.lronaccal(from_=cub_name, to=cal_name) 
-    isis.trim(from_=cal_name, to=trim_name, left=45, right=45)
+    isis.lronaccal(from_=image.cub, to=image.cal.cub)
+    isis.trim(from_=image.cal.cub, to=image.trim.cub, left=45, right=45)
 
-    write_file_list('map.lis', glob='*.trim.cub')
-    isis.mosrange(fromlist='map.lis', to='nac_eqr.map', precision=2,
-        projection='equirectangular')
+    write_file_list(image.map.lis, [image.trim.cub])
+    isis.mosrange(fromlist=image.map.lis, to=image.nac_eqr.map,
+                  precision=2, projection='equirectangular')
 
-    clon, clat = get_clatlon('nac_eqr.map')
+    isis.cam2map(from_=image.trim.cub, to=image.proj.cub,
+                 pixres='map', map=image.nac_eqr.map)
 
-    isis.maptemplate(fromlist='map.lis', map='cam2map.map',
-        projection='equirectangular', clon=clon, clat=clat,
-        rngopt='calc', resopt='calc')
+    create_yml(image, title)
+    create_caption(image, caption)
 
-    isis.cam2map(from_=trim_name, to=proj_name, pixres='map', map='cam2map.map')
+def is_file_list(filename):
+    return filename[0] == '@'
 
-    create_yml(proj_name)
-    create_caption(proj_name)
+def get_file_list(filename):
+    with open(filename[1:]) as filelist:
+        # Read in file and remove comments
+        lines = [line.split('#')[0] for line in filelist     ]
+        lines = [line.strip()       for line in lines        ]
+        return  [line               for line in lines if line]
 
+def get_images(image_arg):
+    if is_file_list(image_arg):
+        return get_file_list(image_arg)
 
-if __name__ == '__main__':
-    arg_parser = ArgumentParser(description='Process a featured image')
-    arg_parser.add_argument('img_names', metavar='IMG', help='the image file (.IMG) to process', numargs='+')
-    args = arg_parser.parse_args()
+    return [image_arg]
 
-    img_names = []
-    for img_name in args.img_names:
-        if img_name[0] == '@':
-            with open(img_name[1:]) as f:
-                img_names.extend([line.strip() for line in f if line.strip()])
-        else:
-            img_names.append(img_name)
+def validate_image(image):
+    if image[-4:] != '.IMG':
+        raise Exception('Image %s name must end in .IMG' % image)
 
-    process_img(args.img_names)
+def main():
+    parser = ArgumentParser(description='Process a featured image')
+    parser.add_argument('images', metavar='IMG', nargs='+',
+                        help='the image file(s) (.IMG) to process')
+    parser.add_argument('--title', '-t', default='New Title',
+                       help='the title of the post')
+    parser.add_argument('--caption', '-c', default='Short Caption.',
+                       help='a short caption for the post')
+
+    args = parser.parse_args()
 
     # FIscript.py @images.list
     # when you have a plural variable name you imply it is a list
+    images = [img for img_arg in args.images for img in get_images(img_arg)]
+    # Validation
+    for image in images:
+        validate_image(image)
+
+    # Using pysis multiprocessing
+    # process_images(images, args.title, args.caption)
+
+    # Or probably a much nicer way for you to do things:
+    # Curry the process_image (see http://docs.python.org/library/functools.html#functools.partial)
+    pipeline = partial(process_image, title=args.title, caption=args.caption) 
+
+    # And use the python built-in process pool because you're a big girl now
+    # (see http://docs.python.org/library/multiprocessing.html#module-multiprocessing.pool)
+    # try:
+    #     pool = Pool()
+    #     pool.map_async(pipeline, images)
+    #     pool.close()
+    #     pool.join()
+
+    # except Exception as error:
+    #     pool.terminate()
+    #     raise error
+
+    # Side note, to change this to run without multiprocessing you can just do:
+    import os
+    print 'ISIS3TESTDATA:', os.environ.get('ISIS3TESTDATA')
+    print 'ISISROOT:', os.environ.get('ISISROOT')
+    map(pipeline, images) # http://docs.python.org/library/functions.html#map
+
+if __name__ == '__main__':
+    main()

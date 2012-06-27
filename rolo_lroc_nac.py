@@ -6,58 +6,96 @@ from pysis.commands import isis
 from pysis.util import write_file_list, file_variations
 from pysis.labels import parse_file_label, parse_label
 import numpy as np
-import scipy
+import scipy5
 
 # Sarah Braden
 # 4/3/2012
 # Must use isis 3.3.1
 # pysis script to project ROLO data to LROCNAC footprints 
-# and get data
 
-# "rolo observation" = set of multispectral rolo files
+# "rolo set" = set of multispectral rolo files
 # "rolo image" = one rolo file of a single band
 
-# processes data: raw input and returns processed data
-# plots: give processed data
-
 # ROLO images to use
-# get this input from the command line
-rolo_observation = 'mm185801'
-# perhaps change rolo_observation to rolo_set: it makes more sense
-
+rolo_set = 'mm1858'
+rolo_subset = '01'
+rolo_base = rolo_set + rolo_subset
 # LROC NAC directory
-nacdir = '/home/sbraden/NACCAL/mm1858/'
+NAC_type = 'pri'
+# NAC_type = 'com'
+# .map files go in nacdir
+nacdir = '/home/sbraden/NACCAL/' + rolo_set + NAC_type
 # ROLO directory
-rolodir = '/home/sbraden/ROLO/' + rolo_observation
+rolodir = '/home/sbraden/ROLO/' + rolo_set + rolo_subset
 
 
-def compute_emission_angles(rolo_observation, angle_dict):
+def photomet_rolo(img_name, rolo_angle_dict):
+    """ Compute and return photometric properties of a projected rolo image
+    Args: LROC NAC frame
+
+    Returns: 
+        clat, clon, emission, incidence
+    """
+    #rolo_band = rolodir + '/footprints/' + no_ext + '.' + rolo_base + '.band0001.cub'
+    # get clat and clon for next calculation (just from the NAC map file) 
+    # needs to be updated for new pysis
+    mapping = parse_file_header(img_name + '.map')['Mapping']
+    clon = mapping['CenterLongitude']
+    clat = mapping['CenterLatitude']
+    emission = compute_emission_angles(rolo_base, rolo_angle_dict, clat, clon)
+    incidence = compute_incidence_angles(rolo_base, rolo_angle_dict, clat, clon)
+    return clat, clon, emission, incidence
+
+
+def project_rolo(img_name):
+    # img_name includes the path
+    """" Reproject ROLO data onto LROC NAC footprints
+
+    Args:
+        img_name: The LROC NAC image that the ROLO data is reprojecting to.
+    """
+    rolo_images = iglob(rolodir + '/*.cub') # all bands of rolo observation
+    # do I need the next two lines?
+    ext_len = -len('.IMG')
+    no_ext = img_name[:ext_len]
+    for rolo_name in rolo_images:
+        isis.map2map(from_=rolo_name, to=rolodir + '/footprints/' + no_ext + '.' + rolo_name, 
+                    map=img_name+'.map', pixres='mpp', 
+                    resolution=7000, interp='nearestneighbor', 
+                    defaultrange='map')
+
+
+def compute_emission_angles(rolo_base, rolo_angle_dict, clat, clon):
     """ compute emission angles
     
     Args:
-        image_name: which set of images do we want angles for?
-        angle_dict: dictionary of angles for images
+        rolo_base: set of rolo images we want incidence for
+        rolo_angle_dict: dictionary of angles for images
+        clat: center latitude for observation
+        clon: center longitude for observation
 
     Returns:
         emission angle the center of the image
     """
-    deltalat = np.radians(np.abs(angle_dict[rolo_observation]['selat'] - pix['lat']))
-    deltalon = np.radians(np.abs(angle_dict[rolo_observation]['selon'] - pix['lon']))
+    deltalat = np.radians(np.abs(rolo_angle_dict[rolo_base]['selat'] - clat))
+    deltalon = np.radians(np.abs(rolo_angle_dict[rolo_base]['selon'] - clon))
     emission = np.degrees(np.arccos(np.cos(deltalat) * np.cos(deltalon)))
     return emission
 
-def compute_incidence_angles(rolo_observation, angle_dict):
+def compute_incidence_angles(rolo_base, rolo_angle_dict, clat, clon):
     """ compute incidence angles
     
     Args:
-        image_name: which set of images do we want angles for?
-        angle_dict: dictionary of angles for images
+        rolo_base: set of rolo images we want incidence for
+        rolo_angle_dict: dictionary of angles for images
+        clat: center latitude for observation
+        clon: center longitude for observation
 
     Returns:
         incidence angle for the center of the image
     """
-    deltalat = np.radians(np.abs(angle_dict[rolo_observation]['sslat'] - pix['lat']))
-    deltalon = np.radians(np.abs(angle_dict[rolo_observation]['sslon'] - pix['lon']))
+    deltalat = np.radians(np.abs(rolo_angle_dict[rolo_base]['sslat'] - clat))
+    deltalon = np.radians(np.abs(rolo_angle_dict[rolo_base]['sslon'] - clon))
     incidence = np.degrees(np.arccos(np.cos(deltalat) * np.cos(deltalon)))
     return incidence
 
@@ -65,15 +103,32 @@ def compute_incidence_angles(rolo_observation, angle_dict):
 content_re = re.compile(r'(Group.*End_Group)', re.DOTALL)
 
 def get_pho_angles(img_name):    
-        output = isis.campt.check_output(from_=img_name)
-        output = content_re.search(output).group(1) 
-        phase_angle = parse_label(output)['GroundPoint']['Phase']
-        incidence_angle = parse_label(output)['GroundPoint']['Incidence']
-        emission_angle = parse_label(output)['GroundPoint']['Emission']
-        return phase_angle, incidence_angle, emission_angle
+    output = isis.campt.check_output(from_=img_name)
+    output = content_re.search(output).group(1) 
+    phase_angle = parse_label(output)['GroundPoint']['Phase']
+    incidence_angle = parse_label(output)['GroundPoint']['Incidence']
+    emission_angle = parse_label(output)['GroundPoint']['Emission']
+    return phase_angle, incidence_angle, emission_angle
 
 
-def multispec_rolo(rolo_observation, img_name):
+def create_mapfile(img_name):
+    """ Create a mapfile in isis from a LROC NAC
+
+    Args: img_name
+
+    """
+    (cub_name, trim_name) = file_variations(img_name,
+            ['.cub', '.trim.cub'])
+    isis.lronac2isis(from_=img_name, to=cub_name)
+    isis.spiceinit(from_=cub_name)
+    isis.trim(from_=cal_name, to=trim_name, left=45, right=45)
+
+    write_file_list('map.lis', trim_name)
+    isis.mosrange(fromlist='map.lis', to=img_name+'.map', precision=2,
+        projection='equirectangular')
+
+
+def multispec_rolo(img_name):
     """ Find the avg and stdev of radiance in ROLO observation projected to NAC
     footprint, for each band.
 
@@ -85,56 +140,18 @@ def multispec_rolo(rolo_observation, img_name):
         dictionary of avg and stdev radiance for each band in rolo indexed 
         by NAC image.
     """
-
-
-def photomet_rolo(img_name, rolo_angle_dict):
-    """ Compute and return photometric properties of a projected rolo image
-    Args: LROC NAC frame
-
-    Returns: 
-        clat, clon, emission, incidence, LS ratio
-    """
-    ext_len = -len('.IMG')
-    no_ext = img_name[:ext_len]
-    rolo_band = rolodir + '/footprints/' + no_ext + rolo_observation + 'band0001.cub'
-    # get clat and clon for next calculation (just from one image) 
-    #mapping = parse_file_header('nac_eqr.map')['Mapping']
-    #clon = mapping['CenterLongitude']
-    #clat = mapping['CenterLatitude']
-    #isis.cam2map(from_=trim_name, to=proj_name, pixres='map', map='nac_eqr.map')
-
-    # add clat and clon as arguments that need to be passed
-    emission = compute_emission_angles(rolo_observation, rolo_angle_dict)
-    incidence = compute_incidence_angles(rolo_observation, rolo_angle_dict)
-
-    # calculate Lommel-Seeliger factor for each point
-    # L-S = cos(i) / ( cos(e) + cos(i) )
-    LommelSeeliger = np.cos( np.radians(incidence) ) / ( np.cos( np.radians(emission) ) + np.cos( np.radians(incidence)))
-    # LS value at Sub Earth point
-    LSsubearth = 0.4590 # I think I need to compute this for each image.
-    # compute LS ratio for each point in image
-    LSratio = LSsubearth / LommelSeeliger
-    return clat, clon, emission, incidence, LSratio
-
-def project_rolo(rolo_observation, img_name):
-    """" Reproject ROLO data onto LROC NAC footprints
-
-    Args:
-        rolo_observation: The rolo_observation that the images are from.
-        img_name: The LROC NAC image that the ROLO data is reprojecting to.
-    """
-    rolo_images = iglob(rolodir + '/*.cub') # all bands of rolo observation
-    ext_len = -len('.IMG')
-    no_ext = img_name[:ext_len]
-    for rolo_name in rolo_images:
-        isis.map2map(from_=rolo_name, to=rolodir + '/footprints/' + no_ext+rolo_name, 
-                    map='nac_eqr.map', pixres='mpp', 
-                    resolution=7000, interp='nearestneighbor', 
-                    defaultrange='map')
+    rolo_images = iglob(rolodir + '/footprints/*.cub') 
+        for rolo_image in rolo_images:
+            isis.stats(from_=rolo_image, to=rolo_image + '.stat')
+            # needs to be updated for new pysis
+            results = parse_file_header(rolo_image + '.stat')['Results']
+            avg = results['Average']
+            stdev = results['StandardDeviation']
 
 
 def main():
-    images = iglob('*.IMG')
+    # remember img_name will include the path!????
+    images = iglob(nacdir + '/*.IMG')
     
     pho_angles = [(img_name, get_pho_angles(img_name)) for img_name in images]
     # import pickle
@@ -150,22 +167,16 @@ def main():
     # zip two lists together
     rolo_angle_dict = dict(zip(angle['imagename'], angle))
 
+    # Create map files from NAC images 
     for img_name in images:
-        (cub_name, trim_name, proj_name) = file_variations(img_name,
-            ['.cub', '.trim.cub', '.proj.cub'])
-
-        isis.lronac2isis(from_=img_name, to=cub_name)
-        isis.spiceinit(from_=cub_name)
-        isis.trim(from_=cal_name, to=trim_name, left=45, right=45)
-
-        write_file_list('map.lis', glob='*.trim.cub')
-        isis.mosrange(fromlist='map.lis', to='nac_eqr.map', precision=2,
-            projection='equirectangular')
-
-        # ROLO observation is "mm185801" for example; set at the command line
-        project_rolo(rolo_observation, img_name) 
-        # pass one rolo image for each LROC NAC
+        # create mapfile from each NAC
+        create_mapfile(img_name)
+        # Project all rolo images to the mapfile for each NAC
+        project_rolo(img_name) 
+        # Get photomet of the rolo images projected to the NAC
         photomet_rolo(img_name, rolo_angle_dict)
+        # get radiance avg and stdev for all bands in rolo subset
+        multispect_rolo()
 
 if __name__ == '__main__':
     main()
