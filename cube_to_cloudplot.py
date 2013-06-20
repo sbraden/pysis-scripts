@@ -47,19 +47,23 @@ def clem_or_wac(img_name):
     '''
     image = CubeFile.open(source_dir+img_name) # pysis.cubefile.CubeFile
     if img_name[-7:-4] == 'wac':
-        wac_320 = image.apply_scaling()[0].T #applies scaling and Transposes
-        wac_415 = image.apply_scaling()[2].T
+        wac_320 = image.apply_scaling()[0].T.apply_numpy_specials()
+        wac_415 = image.apply_scaling()[2].T.apply_numpy_specials()
+        # tell pandas to handle the very negative numbers
         wac_320_over_415 = wac_320/wac_415
         return img_name[-7:-4], wac_320_over_415
 
     elif img_name[-7:-4] == 'clm':
-        clm_950 = image.apply_scaling()[3].T
-        clm_750 = image.apply_scaling()[1].T
+        clm_950 = image.apply_scaling()[3].T.apply_numpy_specials()
+        clm_750 = image.apply_scaling()[1].T.apply_numpy_specials()
         clm_950_over_750 = clm_950/clm_750
+        # tell pandas to handle the very negative numbers
         return img_name[-7:-4], clm_950_over_750
     else:
         print 'This is not a input cube that works with this script.'
 
+
+#applies scaling and Transposes
 
 def get_banddata(image_list):
     '''
@@ -72,7 +76,7 @@ def get_banddata(image_list):
 
     for img_name in image_list:
         camera, ratio_array = clem_or_wac(img_name)
-        index.append(basename(img_name))
+        index.append(basename(img_name[:-4]))
         data.append(ratio_array)
 
     return pd.DataFrame(data, index=index)
@@ -90,9 +94,11 @@ def main():
     clm_img_list = iglob('*_clm.cub')
 
     wac_df = get_banddata(wac_img_list)
-    print wac_df
+    print wac_df # debug
     clem_df = get_banddata(clm_img_list)
-    print clem_df
+    print clem_df # debug
+    
+
     # area.mean(), area.std()
 
 
