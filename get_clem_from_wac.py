@@ -56,13 +56,9 @@ def get_max_sample_line(img_name): # add to module
     Get the max sample line without reading in the image.
     '''
     output = isis.catlab.check_output(from_=img_name)
-    # output = content_re.search(output).group(1)  # will this work? NO
     data = parse_label(output)['IsisCube']['Core']
-    print data
     max_sample = data['Dimensions']['Samples']
-    print max_sample
     max_line = data['Dimensions']['Lines']
-    print max_line
     return max_sample, max_line
 
 
@@ -75,10 +71,9 @@ def get_lat_lon_from_x_y(xy, img_name): # add to  module
         from_  = img_name, 
         format = 'flat', 
         type   = 'image', 
-        sample = xy(1), 
-        line   = xy(2)
+        sample = xy[1], 
+        line   = xy[2]
         )
-    # output = content_re.search(output).group(1)  # will this work? NO
     latitude = parse_label(output)['Results']['PlanetographicLatitude']
     longitude = parse_label(output)['Results']['PositiveEast360Longitude']
     return latitude, longitude
@@ -91,9 +86,11 @@ def main():
     for img_name in image_list:
         # extract corner sample, line
         max_xy = get_max_sample_line(img_name)
+        print max_xy #debug
         min_xy = (1,1)
         # get min max lat lon 
         min_latitude, max_longitude = get_lat_lon_from_x_y(max_xy, img_name)
+        print min_latitude, max_longitude #debug
         max_latitude, min_longitude = get_lat_lon_from_x_y(min_xy, img_name)
         region = (min_latitude, max_latitude, min_longitude, max_longitude)
         # make new maptemplate
