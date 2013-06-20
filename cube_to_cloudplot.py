@@ -9,7 +9,9 @@ from math import floor
 from pysis import isis
 from glob import iglob
 from pysis import CubeFile
+from os.path import basename
 from matplotlib import pyplot as plt
+
 
 source_dir = '/home/sbraden/lunar_rois/matching_cubes/'
 
@@ -69,9 +71,8 @@ def get_banddata(image_list):
     data = []
 
     for img_name in image_list:
-        basename = img_name[:-4]
         camera, ratio_array = clem_or_wac(img_name)
-        index.append(basename)
+        index.append(basename(img_name))
         data.append(ratio_array)
 
     return pd.DataFrame(data, index=index)
@@ -83,10 +84,10 @@ def get_banddata(image_list):
 def main():
 
     # read in WAC images
-    wac_img_list = iglob(source_dir + '*_wac.cub')
+    wac_img_list = iglob('*_wac.cub')
     print wac_img_list
     # read in clementine images
-    clm_img_list = iglob(source_dir + '*_clm.cub')
+    clm_img_list = iglob('*_clm.cub')
 
     wac_df = get_banddata(wac_img_list)
     print wac_df
