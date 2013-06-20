@@ -92,7 +92,7 @@ def main():
         # make new cub file
         isis.map2map(
             from_    = clem_dir + 'clementine_uvvis_warp_mosaic_400m.cub', 
-            to       = img_name[-4]+'_clem.cub', 
+            to       = source_dir + img_name[-4]+'_clem.cub', 
             map      = 'temp_map.map', 
             matchmap = 'true'
             )
