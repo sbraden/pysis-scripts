@@ -68,7 +68,8 @@ def get_lat_lon_from_x_y(xy, img_name): # add to  module
     Returns latitude and longitude 
     '''
     output = isis.mappt.check_output(
-        from_  = img_name, 
+        from_  = img_name,
+        to     = 'mappt_temp.txt' 
         format = 'flat', 
         type   = 'image', 
         sample = xy[0], 
