@@ -3,16 +3,38 @@
 '''
 Take a number of cubes and make them into a cloud plot.
 '''
-
-from math import floor 
-from pysis import isis
-from pysis import CubeFile
-from pysis.labels import parse_file_label, parse_label
 import numpy as np
 import pandas as pd
+from math import floor 
+from pysis import isis
 from glob import iglob
+from pysis import CubeFile
+from matplotlib import pyplot as plt
 
 source_dir = '/home/sbraden/lunar_rois/matching_cubes/'
+
+# Colors will be applyed to filters by filter in alphabetical ordear
+colours = [
+  'red',        # C
+  'blue',       # D
+  'green',      # E
+  'burlywood',  # F
+  'cyan',       # G
+  'magenta',    # I
+  'yellow',     # J
+  'black'       # L
+]
+
+
+def circle_list(seq):
+  """
+  Takes a sequence and creates a generator which
+  circles over the sequence.
+  """
+  i = 0
+  while True:
+    yield seq[i]
+    i = (i + 1)%len(seq)
 
 
 def clem_or_wac(img_name):
@@ -55,6 +77,9 @@ def get_banddata(image_list):
     return pd.DataFrame(data, index=index)
 
 
+# lookup_dict = dict(zip(lookup.FILTER_ID, lookup.BAND_nm))
+
+
 def main():
 
     # read in WAC images
@@ -64,7 +89,9 @@ def main():
     clm_img_list = iglob(source_dir + '*_clm.cub')
 
     wac_df = get_banddata(wac_img_list)
+    print wac_df
     clem_df = get_banddata(clm_img_list)
+    print clem_df
     # area.mean(), area.std()
 
 
