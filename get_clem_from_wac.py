@@ -6,6 +6,13 @@ from pysis import isis
 from pysis.util import write_file_list, file_variations
 from pysis.labels import parse_file_label, parse_label
 
+#    isis.campt(from_=image, to=image.campt)
+#    label = parse_file_label(image.campt)
+
+#    points = label['GroundPoint']
+#    clon  = points['PositiveEast360Longitude']
+#    clat  = points['PlanetocentricLatitude']
+
 
 source_dir = '/home/sbraden/lunar_rois/'
 clem_dir = '/home/sbraden/Datasets/clementine/'
@@ -49,7 +56,8 @@ def get_max_sample_line(img_name): # add to module
     Get the max sample line without reading in the image.
     '''
     output = isis.catlab.check_output(from_=img_name)
-    output = content_re.search(output).group(1)  # will this work?
+    print output
+    # output = content_re.search(output).group(1)  # will this work? NO
     max_sample = parse_label(output)['Dimensions']['Samples']
     max_line = parse_label(output)['Dimensions']['Lines']
     return max_sample, max_line
@@ -67,7 +75,7 @@ def get_lat_lon_from_x_y(xy, img_name): # add to  module
         sample = xy(1), 
         line   = xy(2)
         )
-    output = content_re.search(output).group(1)  # will this work?
+    # output = content_re.search(output).group(1)  # will this work? NO
     latitude = parse_label(output)['Results']['PlanetographicLatitude']
     longitude = parse_label(output)['Results']['PositiveEast360Longitude']
     return latitude, longitude
