@@ -5,13 +5,15 @@ from pysis import isis
 from pysis.labels import parse_file_label, parse_label
 # TODO: use tempfile to write and auto clean isis output files
 
-#    isis.campt(from_=image, to=image.campt)
-#    label = parse_file_label(image.campt)
+# PROBLEM: Clementine output and original WAC do not have the same
+# number of pixels. Example, tsiolkovsky is 20x20 but the clementine version
+# has only 18 samples.
 
-#    points = label['GroundPoint']
-#    clon  = points['PositiveEast360Longitude']
-#    clat  = points['PlanetocentricLatitude']
+# A check of a larger area red-imbrium-flow2 shows that there is a projection
+# error. This is due to the fact that the original file was cropped from a
+# larger projection centered on 0,0. The pixels will therefore not match. 
 
+# try re-running with clat, clon = 0,0
 
 source_dir = '/home/sbraden/lunar_rois/'
 clem_dir = '/home/sbraden/Datasets/clementine/'
@@ -31,8 +33,10 @@ def create_maptemplate(region, projection, scale):
     a scale to create a mapfile.
     region = (minlat, maxlat, minlon, maxlon)
     ''' 
-    center_longitude = region[2] + abs(region[3]-region[2])
-    center_latitude = region[0] + abs(region[1]-region[0])
+    # center_longitude = region[2] + abs(region[3]-region[2])
+    # center_latitude = region[0] + abs(region[1]-region[0])
+    center_latitude = 0.0
+    center_longitude = 0.0
 
     isis.maptemplate(
         projection_=projection,
