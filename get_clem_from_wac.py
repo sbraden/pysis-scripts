@@ -1,12 +1,9 @@
 #!/usr/bin/env python
 
-import re
-from glob import iglob
 from math import floor
-from pysis.commands import isis
+from pysis import isis
 from pysis.util import write_file_list, file_variations
 from pysis.labels import parse_file_label, parse_label
-import numpy as np
 
 
 source_dir = '/home/sbraden/lunar_rois/'
