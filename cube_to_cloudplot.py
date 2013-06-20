@@ -46,17 +46,16 @@ def clem_or_wac(img_name):
     image data array  
     '''
     image = CubeFile.open(source_dir+img_name) # pysis.cubefile.CubeFile
-    image_scaled = image.apply_scaling()
-    image_nan = image_scaled.apply_numpy_specials()
+
     if img_name[-7:-4] == 'wac':
-        wac_320 = image_nan[0].T
-        wac_415 = image_nan[2].T
+        wac_320 = image.apply_numpy_specials()[0].T
+        wac_415 = image.apply_numpy_specials()[2].T
         # tell pandas to handle the very negative numbers
         wac_320_over_415 = wac_320/wac_415
         return img_name[-7:-4], wac_320_over_415
     elif img_name[-7:-4] == 'clm':
-        clm_950 = image_nan[3].T
-        clm_750 = image_nan[1].T
+        clm_950 = image.apply_numpy_specials()[3].T
+        clm_750 = image.apply_numpy_specials()[1].T
         clm_950_over_750 = clm_950/clm_750
         # tell pandas to handle the very negative numbers
         return img_name[-7:-4], clm_950_over_750
