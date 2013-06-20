@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import re
 from math import floor
 from pysis import isis
 from pysis.util import write_file_list, file_variations
