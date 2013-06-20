@@ -1,19 +1,20 @@
 #!/usr/bin/env python
 
+# rename file 
+
 from math import floor 
 from pysis import isis
 from pysis.labels import parse_file_label, parse_label
 # TODO: use tempfile to write and auto clean isis output files
 
 # PROBLEM: Clementine output and original WAC do not have the same
-# number of pixels. Example, tsiolkovsky is 20x20 but the clementine version
-# has only 18 samples.
+# number of pixels. It seems that the clementine output is missing 1 line.
+# Blinking the input and output shows a 1 line shift. It might be a 2 line 
+# shift in some images.
 
-# A check of a larger area red-imbrium-flow2 shows that there is a projection
-# error. This is due to the fact that the original file was cropped from a
-# larger projection centered on 0,0. The pixels will therefore not match. 
+# solution: crop WAC to match Clementine? Manually? using trim and cropspecial?
 
-# try re-running with clat, clon = 0,0
+# clat, clon = 0,0 to match projection of LROC mosaic
 
 source_dir = '/home/sbraden/lunar_rois/'
 clem_dir = '/home/sbraden/Datasets/clementine/'
