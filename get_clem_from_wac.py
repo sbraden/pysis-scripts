@@ -71,8 +71,8 @@ def get_lat_lon_from_x_y(xy, img_name): # add to  module
         from_  = img_name, 
         format = 'flat', 
         type   = 'image', 
-        sample = xy[1], 
-        line   = xy[2]
+        sample = xy[0], 
+        line   = xy[1]
         )
     latitude = parse_label(output)['Results']['PlanetographicLatitude']
     longitude = parse_label(output)['Results']['PositiveEast360Longitude']
@@ -98,7 +98,7 @@ def main():
         # make new cub file
         isis.map2map(
             from_    = clem_dir + 'clementine_uvvis_warp_mosaic_400m.cub', 
-            to       = source_dir + img_name[-4]+'_clem.cub', 
+            to       = source_dir + img_name[:-4]+'_clem.cub', 
             map      = 'temp_map.map', 
             matchmap = 'true'
             )
