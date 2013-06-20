@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 
-import re
-from math import floor
+from math import floor 
 from pysis import isis
-from pysis.util import write_file_list, file_variations
 from pysis.labels import parse_file_label, parse_label
+# TODO: use tempfile to write and auto clean isis output files
 
 #    isis.campt(from_=image, to=image.campt)
 #    label = parse_file_label(image.campt)
@@ -32,7 +31,6 @@ def create_maptemplate(region, projection, scale):
     a scale to create a mapfile.
     region = (minlat, maxlat, minlon, maxlon)
     ''' 
-    # TODO: does it have to be a string now? I don't think so
     center_longitude = region[2] + abs(region[3]-region[2])
     center_latitude = region[0] + abs(region[1]-region[0])
 
@@ -51,7 +49,7 @@ def create_maptemplate(region, projection, scale):
                     )
 
 
-def get_max_sample_line(img_name): # add to module
+def get_max_sample_line(img_name): # TODO: add to module
     '''
     Get the max sample line without reading in the image.
     '''
@@ -62,7 +60,7 @@ def get_max_sample_line(img_name): # add to module
     return max_sample, max_line
 
 
-def get_lat_lon_from_x_y(xy, img_name): # add to  module
+def get_lat_lon_from_x_y(xy, img_name): # TODO: add to module
     '''
     Takes xy tuple containing sample and line ints
     Returns latitude and longitude 
