@@ -9,10 +9,10 @@ from pysis.labels import parse_file_label, parse_label
 import numpy as np
 
 
-source_dir = '/home/sbraden/'
+source_dir = '/home/sbraden/lunar_rois/'
 clem_dir = '/home/sbraden/Datasets/clementine/'
 projection = 'equirectangular'
-scale = 473.8 # units of meters per pixel
+scale = 473.8 # units of meters per pixel LROC WAC 7-band mosaic
 
 
 def read_in_list(filename):
@@ -69,7 +69,6 @@ def get_lat_lon_from_x_y(xy, img_name): # add to  module
         sample = xy(1), 
         line   = xy(2)
         )
-
     output = content_re.search(output).group(1)  # will this work?
     latitude = parse_label(output)['Results']['PlanetographicLatitude']
     longitude = parse_label(output)['Results']['PositiveEast360Longitude']
@@ -78,7 +77,7 @@ def get_lat_lon_from_x_y(xy, img_name): # add to  module
 
 def main():
 
-    image_list = read_in_list('temp.txt') # read in image list
+    image_list = read_in_list(source_dir+'temp.txt') # read in image list
 
     for img_name in image_list:
         # extract corner sample, line
@@ -92,7 +91,7 @@ def main():
         create_maptemplate(region, projection, scale)
         # make new cub file
         isis.map2map(
-            from_    = img_name, 
+            from_    = clem_dir + 'clementine_uvvis_warp_mosaic_400m.cub', 
             to       = img_name[-4]+'_clem.cub', 
             map      = 'temp_map.map', 
             matchmap = 'true'
