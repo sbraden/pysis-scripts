@@ -56,10 +56,13 @@ def get_max_sample_line(img_name): # add to module
     Get the max sample line without reading in the image.
     '''
     output = isis.catlab.check_output(from_=img_name)
-    print output
     # output = content_re.search(output).group(1)  # will this work? NO
-    max_sample = parse_label(output)['Dimensions']['Samples']
-    max_line = parse_label(output)['Dimensions']['Lines']
+    data = parse_label(output)['IsisCube']['Core']
+    print data
+    max_sample = data['Dimensions']['Samples']
+    print max_sample
+    max_line = data['Dimensions']['Lines']
+    print max_line
     return max_sample, max_line
 
 
