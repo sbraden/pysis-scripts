@@ -72,6 +72,7 @@ def make_cross_plot(wac_df, clm_df):
     for index_name in wac_df.index:
         roi_name = index_name[:-4]
         x = wac_df.loc[index_name].values
+        print x # debug
         y = clm_df.loc[roi_name+'_clm'].values
         print x.mean() # debug
         plt.errorbar(x.mean(), y.mean(), xerr=np.std(x), yerr=np.std(y),
