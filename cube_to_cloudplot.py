@@ -53,7 +53,7 @@ def make_cloud_plot(wac_df, clm_df):
         print roi_name # debug
         x = wac_df.loc[index_name].values
         y = clm_df.loc[roi_name+'_clm'].values
-        plt.scatter(x, y, marker='*', label=(roi_name),
+        plt.scatter(x, y, marker='o', label=(roi_name),
                 c=colour_circle.next())
 
     fontP = FontProperties()
