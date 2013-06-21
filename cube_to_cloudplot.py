@@ -79,7 +79,7 @@ def make_cross_plot(wac_df, clm_df):
         y_data = np.ma.masked_array(y[0],np.isnan(y[0]))
         plt.errorbar(np.mean(x_data), np.mean(y_data), xerr=np.std(x_data),
             yerr=np.std(y_data), marker='o', label=(roi_name), 
-            c='lightred')
+            c='chartreuse')
 
     rois = pd.read_csv('/home/sbraden/imps_ratio.csv', index_col=0)
     print rois #debug
