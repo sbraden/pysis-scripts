@@ -64,7 +64,7 @@ def make_cloud_plot(wac_df, clm_df):
 
 
 def make_cross_plot(wac_df, clm_df):
-        '''
+    '''
     x = 320/415
     y = 950/750
     '''
