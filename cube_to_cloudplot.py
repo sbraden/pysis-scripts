@@ -53,8 +53,7 @@ def make_cloud_plot(wac_df, clm_df):
         print roi_name # debug
         x = wac_df.loc[index_name].values
         y = clm_df.loc[roi_name+'_clm'].values
-        plt.scatter(x, y, marker='o', label=(roi_name),
-                c=colour_circle.next())
+        plt.scatter(x, y, marker='o', label=(roi_name), c=colour_circle.next())
 
     fontP = FontProperties()
     fontP.set_size('small')
@@ -62,6 +61,31 @@ def make_cloud_plot(wac_df, clm_df):
     plt.xlabel('320/415 nm WAC ratio', fontsize=14)
     plt.ylabel('950/750 nm CLEM ratio', fontsize=14)
     plt.savefig('lunar_roi_cloud_plot.png', dpi=300)
+
+
+def make_cross_plot(wac_df, clm_df):
+        '''
+    x = 320/415
+    y = 950/750
+    '''
+    colour_circle = circle_list(colours)
+
+    for index_name in wac_df.index:
+        roi_name = index_name[:-4]
+        print roi_name # debug
+        x = wac_df.loc[index_name].values.mean()
+        x_std = wac_df.loc[index_name].values.std()
+        y = clm_df.loc[roi_name+'_clm'].values.mean()
+        y_std = clm_df.loc[roi_name+'_clm'].values.std()
+        plt.errorbar(x, y, xerr=x_std, yerr=y_std,
+            marker='o', label=(roi_name), c=colour_circle.next())
+
+    fontP = FontProperties()
+    fontP.set_size('small')
+    plt.legend(loc='best', fancybox=True, prop=fontP, scatterpoints=1)
+    plt.xlabel('320/415 nm WAC ratio', fontsize=14)
+    plt.ylabel('950/750 nm CLEM ratio', fontsize=14)
+    plt.savefig('lunar_roi_cross_plot.png', dpi=300)
 
 
 def clem_or_wac(img_name):
@@ -120,11 +144,7 @@ def main():
     clm_df = get_banddata(clm_img_list)
     print clm_df # debug
     make_cloud_plot(wac_df, clm_df)
-    
-
-    # area.mean(), area.std()
-    
-
+    make_cross_plot(wac_df, clm_df)
 
 if __name__ == '__main__':
     main()
