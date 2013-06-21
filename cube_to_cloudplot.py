@@ -73,11 +73,7 @@ def make_cross_plot(wac_df, clm_df):
         roi_name = index_name[:-4]
         x = wac_df.loc[index_name].values
         y = clm_df.loc[roi_name+'_clm'].values
-        x_mean = x.mean()
-        x_stdev = x.std()
-        y_mean = y.mean()
-        y_stdev = y.std()
-        plt.errorbar(x, y, xerr=x_std, yerr=y_std,
+        plt.errorbar(x.mean(), y.mean(), xerr=np.std(x), yerr=np.std(y),
             marker='o', label=(roi_name), c=colour_circle.next())
 
     fontP = FontProperties()
