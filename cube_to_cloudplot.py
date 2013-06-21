@@ -50,7 +50,6 @@ def make_cloud_plot(wac_df, clm_df):
 
     for index_name in wac_df.index:
         roi_name = index_name[:-4]
-        print roi_name # debug
         x = wac_df.loc[index_name].values
         y = clm_df.loc[roi_name+'_clm'].values
         plt.scatter(x, y, marker='o', label=(roi_name), c=colour_circle.next())
@@ -72,11 +71,12 @@ def make_cross_plot(wac_df, clm_df):
 
     for index_name in wac_df.index:
         roi_name = index_name[:-4]
-        print roi_name # debug
-        x = wac_df.loc[index_name].values.mean()
-        x_std = wac_df.loc[index_name].values.std()
-        y = clm_df.loc[roi_name+'_clm'].values.mean()
-        y_std = clm_df.loc[roi_name+'_clm'].values.std()
+        x = wac_df.loc[index_name].values
+        y = clm_df.loc[roi_name+'_clm'].values
+        x_mean = x.mean()
+        x_std = x.std()
+        y_mean = y.mean()
+        y_std = y.std()
         plt.errorbar(x, y, xerr=x_std, yerr=y_std,
             marker='o', label=(roi_name), c=colour_circle.next())
 
