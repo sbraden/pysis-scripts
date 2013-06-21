@@ -52,7 +52,8 @@ def make_cloud_plot(wac_df, clm_df):
         roi_name = index_name[:-4]
         x = wac_df.loc[index_name].values
         y = clm_df.loc[roi_name+'_clm'].values
-        plt.scatter(x, y, marker='o', label=(roi_name), c=colour_circle.next())
+        plt.scatter(x[0], y[0], marker='o', label=(roi_name), 
+            c=colour_circle.next())
 
     fontP = FontProperties()
     fontP.set_size('small')
@@ -60,6 +61,7 @@ def make_cloud_plot(wac_df, clm_df):
     plt.xlabel('320/415 nm WAC ratio', fontsize=14)
     plt.ylabel('950/750 nm CLEM ratio', fontsize=14)
     plt.savefig('lunar_roi_cloud_plot.png', dpi=300)
+    plt.close()
 
 
 def make_cross_plot(wac_df, clm_df):
@@ -83,6 +85,7 @@ def make_cross_plot(wac_df, clm_df):
     plt.xlabel('320/415 nm WAC ratio', fontsize=14)
     plt.ylabel('950/750 nm CLEM ratio', fontsize=14)
     plt.savefig('lunar_roi_cross_plot.png', dpi=300)
+    plt.close()
 
 
 def clem_or_wac(img_name):
