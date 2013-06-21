@@ -81,12 +81,16 @@ def make_cross_plot(wac_df, clm_df):
             yerr=np.std(y_data), marker='o', label=(roi_name), 
             c=colour_circle.next())
 
-    rois = pd.read_csv('/home/sbraden/imps_ratio.csv', index_col=0)
-    print rois #debug
-    for roi_name in rois.index:
-        ratio = rois.loc[roi_name].values
-        plt.scatter(ratio[1], ratio[0], marker='s', 
-            c='black')
+    rois_rough = pd.read_csv('/home/sbraden/imps_ratio_rough.csv', index_col=0)
+    rois_mare = pd.read_csv('/home/sbraden/imps_ratio_mare.csv', index_col=0)
+
+    for roi_name in rois_rough.index:
+        ratio = rois_rough.loc[roi_name].values
+        plt.scatter(ratio[1], ratio[0], marker='s', c='blue')
+    
+    for roi_name in rois_mare.index:
+        ratio = rois_mare.loc[roi_name].values
+        plt.scatter(ratio[1], ratio[0], marker='s', c='red')
 
     fontP = FontProperties()
     fontP.set_size('small')
