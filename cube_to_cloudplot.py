@@ -10,20 +10,24 @@ from glob import iglob
 from pysis import CubeFile
 from os.path import basename
 from matplotlib import pyplot as plt
+from matplotlib.font_manager import FontProperties
 
 
 source_dir = '/home/sbraden/lunar_rois/matching_cubes/'
 
 # Colors will be applyed to filters by filter in alphabetical ordear
 colours = [
-  'red',        # C
-  'blue',       # D
-  'green',      # E
-  'burlywood',  # F
-  'cyan',       # G
-  'magenta',    # I
-  'yellow',     # J
-  'black'       # L
+  'red',
+  'blue',
+  'green',
+  'burlywood',
+  'cyan',
+  'magenta',
+  'yellow',
+  'black',
+  'darkorange',
+  'purple',
+  'rosybrown'
 ]
 
 
@@ -49,10 +53,12 @@ def make_cloud_plot(wac_df, clm_df):
         print roi_name # debug
         x = wac_df.loc[index_name].values
         y = clm_df.loc[roi_name+'_clm'].values
-        plt.scatter(x, y, marker='o', label=(roi_name),
+        plt.scatter(x, y, marker='*', label=(roi_name),
                 c=colour_circle.next())
 
-    plt.legend(loc='best', fancybox=True, scatterpoints=1)
+    fontP = FontProperties()
+    fontP.set_size('small')
+    plt.legend(loc='best', fancybox=True, prop=fontP, scatterpoints=1)
     plt.xlabel('320/415 nm WAC ratio', fontsize=14)
     plt.ylabel('950/750 nm CLEM ratio', fontsize=14)
     plt.savefig('lunar_roi_cloud_plot.png', dpi=300)
