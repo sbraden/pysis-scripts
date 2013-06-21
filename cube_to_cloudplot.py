@@ -52,7 +52,8 @@ def make_cloud_plot(wac_df, clm_df):
         plt.scatter(x, y, marker='o', label=(roi_name),
                 c=colour_circle.next())
 
-    plt.legend(loc='best')
+    plt.legend(loc='best', fancybox=True, 
+        fontsize='x-small', scatterpoints=1)
     plt.xlabel('320/415 nm WAC ratio', fontsize=14)
     plt.ylabel('950/750 nm CLEM ratio', fontsize=14)
     plt.savefig('lunar_roi_cloud_plot.png', dpi=300)
