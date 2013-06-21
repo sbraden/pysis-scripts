@@ -112,7 +112,7 @@ def main():
     wac_df = get_banddata(wac_img_list)
     print wac_df # debug
     clm_df = get_banddata(clm_img_list)
-    print clem_df # debug
+    print clm_df # debug
     make_cloud_plot(wac_df, clm_df)
     
 
