@@ -27,7 +27,7 @@ colours = [
   'black',
   'darkorange',
   'purple',
-  'rosybrown'
+  'lightgreen'
 ]
 
 
@@ -75,8 +75,10 @@ def make_cross_plot(wac_df, clm_df):
         roi_name = index_name[:-4]
         x = wac_df.loc[index_name].values
         y = clm_df.loc[roi_name+'_clm'].values
-        plt.errorbar(np.mean(x[0]), np.mean(y[0]), xerr=np.std(x[0]),
-            yerr=np.std(y[0]), marker='o', label=(roi_name), 
+        x_data = np.ma.masked_array(x[0],np.isnan(x[0]))
+        y_data = np.ma.masked_array(y[0],np.isnan(y[0]))
+        plt.errorbar(np.mean(x_data), np.mean(y_data), xerr=np.std(x_data),
+            yerr=np.std(y_data), marker='o', label=(roi_name), 
             c=colour_circle.next())
 
     fontP = FontProperties()
