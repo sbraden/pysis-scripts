@@ -85,12 +85,12 @@ def make_cross_plot(wac_df, clm_df):
     print rois #debug
     for roi_name in rois.index:
         ratio = rois.loc[roi_name].values
-        plt.scatter(ratio[1], ratio[0], marker='s', label=(roi_name), 
-            c=colour_circle.next())
+        plt.scatter(ratio[1], ratio[0], marker='s', 
+            c='black')
 
     fontP = FontProperties()
     fontP.set_size('small')
-    plt.legend(loc='lower right', prop=fontP, scatterpoints=1)
+    plt.legend(loc='lower right', prop=fontP, nnumpoints=1)
     plt.xlabel('320/415 nm WAC ratio', fontsize=14)
     plt.ylabel('950/750 nm CLEM ratio', fontsize=14)
     plt.savefig('lunar_roi_cross_plot.png', dpi=300)
