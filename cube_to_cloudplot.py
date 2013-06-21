@@ -81,7 +81,8 @@ def make_cross_plot(wac_df, clm_df):
             yerr=np.std(y_data), marker='o', label=(roi_name), 
             c=colour_circle.next())
 
-    rois = pd.read_csv('/home/sbraden/imps_ratio.csv', header=0, index_col=0)
+    rois = pd.read_csv('/home/sbraden/imps_ratio.csv', index_col=0)
+    print rois #debug
     for roi_name in rois.index:
         ratio = rois.loc[roi_name].values
         plt.scatter(ratio[1], ratio[0], marker='o', label=(roi_name), 
