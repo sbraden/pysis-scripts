@@ -5,7 +5,6 @@ Take a number of cubes and make them into a cloud plot.
 '''
 import numpy as np
 import pandas as pd
-from math import floor 
 from pysis import isis
 from glob import iglob
 from pysis import CubeFile
@@ -37,6 +36,26 @@ def circle_list(seq):
   while True:
     yield seq[i]
     i = (i + 1)%len(seq)
+
+def make_cloud_plot(wac_df, clm_df):
+    '''
+    x = 320/415
+    y = 950/750
+    '''
+    colour_circle = circle_list(colours)
+
+    for index_name in wac_df.index:
+        roi_name = index_name[:-4]
+        print roi_name # debug
+        x = wac_df.loc[index_name].values
+        y = clm_df.loc[roi_name+'_clm'].values
+        plt.scatter(x, y, marker='o', label=(roi_name),
+                c=colour_circle.next())
+
+    plt.legend(loc='best')
+    plt.xlabel('320/415 nm WAC ratio', fontsize=14)
+    plt.ylabel('950/750 nm CLEM ratio', fontsize=14)
+    plt.savefig('lunar_roi_cloud_plot.png', dpi=300)
 
 
 def clem_or_wac(img_name):
@@ -82,9 +101,6 @@ def get_banddata(image_list):
     return pd.DataFrame(data, index=index)
 
 
-# lookup_dict = dict(zip(lookup.FILTER_ID, lookup.BAND_nm))
-
-
 def main():
 
     # read in WAC images
@@ -95,11 +111,13 @@ def main():
 
     wac_df = get_banddata(wac_img_list)
     print wac_df # debug
-    clem_df = get_banddata(clm_img_list)
+    clm_df = get_banddata(clm_img_list)
     print clem_df # debug
+    make_cloud_plot(wac_df, clm_df)
     
 
     # area.mean(), area.std()
+    
 
 
 if __name__ == '__main__':
