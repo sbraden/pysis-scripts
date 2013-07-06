@@ -78,8 +78,8 @@ def main():
 
     subearthlat = rolo_angle_dict[image_name]['selat']
     subearthlon = rolo_angle_dict[image_name]['selon']
-    subsolarlat = rolo_angle_dict[image_name]['SSlat'] # should this be caps?
-    subsolarlon = rolo_angle_dict[image_name]['SSlon'] # should this be caps?
+    subsolarlat = rolo_angle_dict[image_name]['sslat']
+    subsolarlon = rolo_angle_dict[image_name]['sslon']
     lat, lon = rolo_pix_data['lat'], rolo_pix_data['lon']
     emission = rolotools.compute_emission(subearthlat, subearthlon, lat, lon)
     incidence = rolotoos.compute_incidence(subsolarlat, subsolarlon, lat, lon)
