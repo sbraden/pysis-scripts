@@ -21,7 +21,7 @@ import pyfits
 
 # TODO: make the projection default to sinusoidal
 
-# TODO: Auto scale bar seems to be working
+# TODO: Auto scale bar seems to be working?
 
 # TODO: Have the option to read in a .csv file instead of command line input
 
