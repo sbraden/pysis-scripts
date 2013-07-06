@@ -14,44 +14,12 @@
 import numpy as np
 from matplotlib import pyplot as plt
 import scipy
+import rolotools
 
 # MAIN TO-DO: Make the functions select the correct image_group
 
 # "mm185801.band0008.calmapcrop.cub"
 image_name = 'mm185801'
-
-def compute_emission_angles(image_name, angle_dict, image_data):
-    """ compute emission angles
-    
-    Args:
-        image_name: which set of images do we want angles for?
-        angle_dict: dictionary of angles for images
-        image_data: numpy array of image data
-
-    Returns:
-        emission angles for every point in the image.
-    """
-    deltalat = np.radians(np.abs(dictionary[image_name]['selat'] - pix['lat']))
-    deltalon = np.radians(np.abs(angle_dict[image_name]['selon'] - pix['lon']))
-    emission = np.degrees(np.arccos(np.cos(deltalat) * np.cos(deltalon)))
-    return emission
-
-def compute_incidence_angles(image_name, angle_dict, image_data):
-    """ compute incidence angles
-    
-    Args:
-        image_name: which set of images do we want angles for?
-        angle_dict: dictionary of angles for images
-        image_data: numpy array of image data
-
-    Returns:
-        incidence angles for every point in the image.
-    """
-    deltalat = np.radians(np.abs(angle_dict[image_name]['SSlat'] - pix['lat']))
-    deltalon = np.radians(np.abs(angle_dict[image_name]['SSlon'] - pix['lon']))
-    incidence = np.degrees(np.arccos(np.cos(deltalat) * np.cos(deltalon)))
-    return incidence
-
 
 def write_image(value, filename):
     """ write values in array to an ascii image
@@ -96,6 +64,7 @@ def main():
       'names': ['filename','sample','line','lat','lon'],
       'formats': ['S64', 'f8','f8', 'f8', 'f8']
     }
+    # rolo_pix_data: numpy array of image data
     rolo_pix_data = np.loadtxt('rolo_s_l_lat_lon.csv', dtype=dtype, delimiter=',')
 
     dtype = {
@@ -104,10 +73,16 @@ def main():
     }
     angle = np.loadtxt('rolo_angle_info.csv', dtype=dtype, delimiter=',')
 
+    # rolo_angle_dict: dictionary of angles for images
     rolo_angle_dict = dict(zip(angle['imagename'], angle))
 
-    emission = compute_emission_angles(image_name, rolo_angle_dict, rolo_pix_data)
-    incidence = compute_incidence_angles(image_name, rolo_angle_dict, rolo_pix_data)
+    subearthlat = rolo_angle_dict[image_name]['selat']
+    subearthlon = rolo_angle_dict[image_name]['selon']
+    subsolarlat = rolo_angle_dict[image_name]['SSlat'] # should this be caps?
+    subsolarlon = rolo_angle_dict[image_name]['SSlon'] # should this be caps?
+    lat, lon = rolo_pix_data['lat'], rolo_pix_data['lon']
+    emission = rolotools.compute_emission(subearthlat, subearthlon, lat, lon)
+    incidence = rolotoos.compute_incidence(subsolarlat, subsolarlon, lat, lon)
 
     # calculate Lommel-Seeliger factor for each point
     # L-S = cos(i) / ( cos(e) + cos(i) )
