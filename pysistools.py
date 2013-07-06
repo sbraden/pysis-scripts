@@ -2,16 +2,38 @@
 from pysis.commands import isis
 from pysis.util import write_file_list, file_variations
 from pysis.labels import parse_file_label, parse_label
+import os
+import re
 
 
 # TODO: make a even/odd function that will perform a command for both even
 # and odd wac frames.
+
+content_re = re.compile(r'(Group.*End_Group)', re.DOTALL)
 
 '''
 pysistools or pyst
 Module for often used functions while scripting using pysis.
 To use: import pysistools as pyst
 '''
+def read_in_list(filename):    # Do I need this? can't I just glob?
+    with open(filename) as f:
+        lines = f.read().splitlines()
+    return lines
+
+
+def create_mosaic(subname):
+    os.system('ls '+subname+'*.proj.cub '+ subname+'*.proj.cub > proj.lis')
+    isis.automos(fromlist=proj.lis, mosaic=subname+'.mos.cub')
+    os.system('rm -f proj.lis') # CLEAN UP: there is a better way to run this
+    pass
+
+
+def read_topo(img_name):
+    '''
+    Reads in either a fits or a isis .cub file.
+    '''
+
 
 def get_pixel_scale(img_name):
     '''
@@ -22,6 +44,13 @@ def get_pixel_scale(img_name):
     output = content_re.search(output).group(1) 
     pixel_scale = parse_label(output)['GroundPoint']['SampleResolution']
     return pixel_scale
+
+def get_img_center(img_name):
+    output = isis.campt.check_output(from_=img_name)
+    output = content_re.search(output).group(1) 
+    clon = parse_label(output)['GroundPoint']['PositiveEast360Longitude']
+    clat = parse_label(output)['GroundPoint']['PlanetographicLatitude']
+    return clat, clon
 
 
 def get_center_lat_lon(minlat, maxlat, minlon, maxlon):
@@ -37,18 +66,6 @@ def get_center_lat_lon(minlat, maxlat, minlon, maxlon):
 #    minlon, maxlon = region[2], region[3]
 
 
-def read_in_list(filename):
-    with open(filename) as f:
-        lines = f.read().splitlines()
-    return lines
-
-def create_mosaic(subname):
-    os.system('ls '+subname+'*.proj.cub '+ subname+'*.proj.cub > proj.lis')
-    os.system('automos fromlist=proj.lis mosaic='+subname+'.mos.cub')
-    os.system('rm -f proj.lis') # CLEAN UP
-    pass
-
-
 def makemap(region, feature, scale, proj):
     '''
     Uses a set of latitude and longitude boundaries, a projection, and
@@ -56,6 +73,7 @@ def makemap(region, feature, scale, proj):
     '''
     clon = region[2]+abs(region[3]-region[2])/2
     clat = region[0]+abs(region[1]-region[0])/2
+
     isis.maptemplate(map=feature+'.map', 
                      projection=proj,
                      clat=clat,
@@ -79,6 +97,7 @@ def makemap_freescale(region, feature, proj, listfile):
     '''
     clon = region[2]+abs(region[3]-region[2])/2
     clat = region[0]+abs(region[1]-region[0])/2
+
     isis.maptemplate(map=feature+'.map',
                      fromlist=listfile, 
                      projection=proj,
@@ -93,7 +112,6 @@ def makemap_freescale(region, feature, proj, listfile):
                      maxlon=region[3]
                      )
     pass
-
 
 
 def process_frames(frames, color, name, model, feature): 
@@ -131,25 +149,19 @@ def get_image_info(filename):
     
     Returns: Dictionary
     '''
-    os.system('catlab from='+filename+' to=catlab.pvl append=FALSE')
-    str1 = 'getkey from=catlab.pvl objname=IsisCube'
+    output = isis.catlab.check_output(from_=img_name)
+    output = content_re.search(output).group(1)
+    obj = parse_label(output)['IsisCube']
     #v1.6
-    version_id = os.popen(str1+' grpname=Archive keyword=ProductVersionId').read()
-    exp_time = os.popen(str1+' grpname=Instrument keyword=ExposureDuration').read()
-    fpa_temp = os.popen(str1+' grpname=Instrument keyword=MiddleTemperatureFpa').read()
     #2011-10-10T13:45:31.791 ISO formatted date
-    start_time = os.popen(str1+' grpname=Instrument keyword=StartTime').read() 
-    samples = os.popen(str1+' grpname=Dimensions keyword=Samples').read() 
-    lines = os.popen(str1+' grpname=Dimensions keyword=Lines').read()
-    bands = os.popen(str1+' grpname=Dimensions keyword=Bands').read()
-
-    data = {'version_id': float(version_id[1:]),
-            'exp_time': float(exp_time),
-            'fpa_temp': float(fpa_temp),
-            'start_time': start_time,
-            'samples': samples,
-            'lines': lines,
-            'bands': bands
+    data = {
+            'version_id': obj['Archive']['ProductVersionId']),
+            'exp_time':   obj['Instrument']['ExposureDuration'],
+            'fpa_temp':   obj['Instrument']['MiddleTemperatureFpa'],
+            'start_time': obj['Instrument']['StartTime'],
+            'samples':    obj['Dimensions']['Samples'],
+            'lines':      obj['Dimensions']['Lines'],
+            'bands':      obj['Dimensions']['Bands']
             }
 
     os.system('rm -f catlab.pvl') # CLEAN UP
@@ -157,7 +169,7 @@ def get_image_info(filename):
     return data
 
 
-def get_points_angles(filename):
+def get_points_angles(img_name):
     '''
     Runs campt and gets the requested information
 
@@ -165,21 +177,21 @@ def get_points_angles(filename):
     
     Returns: Dictionary
     ''' 
-    os.system('campt from='+filename+' to=campt.pvl append=FALSE')
-    str1 = 'getkey from=campt.pvl grpname=GroundPoint'
+    output = isis.campt.check_output(from_=img_name)
+    output = content_re.search(output).group(1)
+    gp = parse_label(output)['GroundPoint']
 
-    subsolar_azimuth = os.popen(str1+' keyword=SubSolarAzimuth').read()
-    subsolar_ground_azimuth = os.popen(str1+' keyword=SubSolarGroundAzimuth').read()
-    solar_distance = os.popen(str1+' keyword=SolarDistance').read()
+    pixel_scale = gp['SampleResolution']
+    subsolar_azimuth = gp['SubSolarAzimuth']
+    subsolar_ground_azimuth = gp['SubSolarGroundAzimuth']
+    solar_distance = gp['SolarDistance']
     
     data = {'subsolar_azimuth': float(subsolar_azimuth),
             'subsolar_ground_azimuth': float(subsolar_ground_azimuth),
             'solar_distance': float(solar_distance)
-            }
-    '''
-    image_writer = csv.writer(image_datafile, delimiter=',', quoting=csv.QUOTE_MINIMAL)
-    image_writer.writerow([name, start_time, exp_time, fpa_temp, subsolar_azimuth, subsolar_ground_azimuth, solar_distance])
-    '''
+            } # do I need this?
+
     os.system('rm -f campt.pvl') # CLEAN UP
+    # do I need to worry about campt.pvl files appending each other?
 
     return data
