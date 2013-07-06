@@ -3,6 +3,7 @@
 '''
 Take a number of cubes and make them into a cloud plot.
 '''
+import itertools
 import numpy as np
 import pandas as pd
 from pysis import isis
@@ -30,30 +31,21 @@ colours = [
   'lightgreen'
 ]
 
+colorloop=intertools.cycle(colors) # using intertools!
 
-def circle_list(seq):
-  """
-  Takes a sequence and creates a generator which
-  circles over the sequence.
-  """
-  i = 0
-  while True:
-    yield seq[i]
-    i = (i + 1)%len(seq)
 
 def make_cloud_plot(wac_df, clm_df):
     '''
     x = 320/415
     y = 950/750
     '''
-    colour_circle = circle_list(colours)
 
     for index_name in wac_df.index:
         roi_name = index_name[:-4]
         x = wac_df.loc[index_name].values
         y = clm_df.loc[roi_name+'_clm'].values
         plt.scatter(x[0], y[0], marker='o', label=(roi_name), 
-            c=colour_circle.next())
+            c=colorloop.next())
 
     fontP = FontProperties()
     fontP.set_size('small')
@@ -69,7 +61,6 @@ def make_cross_plot(wac_df, clm_df):
     x = 320/415
     y = 950/750
     '''
-    colour_circle = circle_list(colours)
 
     for index_name in wac_df.index:
         roi_name = index_name[:-4]
@@ -79,7 +70,7 @@ def make_cross_plot(wac_df, clm_df):
         y_data = np.ma.masked_array(y[0],np.isnan(y[0]))
         plt.errorbar(np.mean(x_data), np.mean(y_data), xerr=np.std(x_data),
             yerr=np.std(y_data), marker='o', label=(roi_name), 
-            c=colour_circle.next())
+            c=colorloop.next())
 
     rois_rough = pd.read_csv('/home/sbraden/imps_ratio_rough.csv', index_col=0)
     rois_mare = pd.read_csv('/home/sbraden/imps_ratio_mare.csv', index_col=0)
