@@ -6,6 +6,7 @@ from pysis.commands import isis
 from pysis.util import write_file_list, file_variations
 from pysis.labels import parse_file_label, parse_label
 import numpy as np
+import rolotools
 import scipy5
 
 # Sarah Braden
@@ -40,11 +41,15 @@ def photomet_rolo(img_name, rolo_angle_dict):
     # get clat and clon for next calculation (just from the NAC map file) 
     # needs to be updated for new pysis
     mapping = parse_file_header(img_name + '.map')['Mapping']
-    clon = mapping['CenterLongitude']
-    clat = mapping['CenterLatitude']
-    emission = compute_emission_angles(rolo_base, rolo_angle_dict, clat, clon)
-    incidence = compute_incidence_angles(rolo_base, rolo_angle_dict, clat, clon)
-    return clat, clon, emission, incidence
+    lat = mapping['CenterLatitude']
+    lon = mapping['CenterLongitude']
+    subearthlat = rolo_angle_dict[rolo_base]['selat']
+    subearthlon = rolo_angle_dict[rolo_base]['selon']
+    subsolarlat = rolo_angle_dict[rolo_base]['sslat']
+    subsolarlon = rolo_angle_dict[rolo_base]['sslon']
+    emission = rolotools.compute_emission(subearthlat, subearthlon, lat, lon)
+    incidence = rolotoos.compute_incidence(subsolarlat, subsolarlon, lat, lon)
+    return lat, lon, emission, incidence
 
 
 def project_rolo(img_name):
@@ -64,40 +69,6 @@ def project_rolo(img_name):
                     resolution=7000, interp='nearestneighbor', 
                     defaultrange='map')
 
-
-def compute_emission_angles(rolo_base, rolo_angle_dict, clat, clon):
-    """ compute emission angles
-    
-    Args:
-        rolo_base: set of rolo images we want incidence for
-        rolo_angle_dict: dictionary of angles for images
-        clat: center latitude for observation
-        clon: center longitude for observation
-
-    Returns:
-        emission angle the center of the image
-    """
-    deltalat = np.radians(np.abs(rolo_angle_dict[rolo_base]['selat'] - clat))
-    deltalon = np.radians(np.abs(rolo_angle_dict[rolo_base]['selon'] - clon))
-    emission = np.degrees(np.arccos(np.cos(deltalat) * np.cos(deltalon)))
-    return emission
-
-def compute_incidence_angles(rolo_base, rolo_angle_dict, clat, clon):
-    """ compute incidence angles
-    
-    Args:
-        rolo_base: set of rolo images we want incidence for
-        rolo_angle_dict: dictionary of angles for images
-        clat: center latitude for observation
-        clon: center longitude for observation
-
-    Returns:
-        incidence angle for the center of the image
-    """
-    deltalat = np.radians(np.abs(rolo_angle_dict[rolo_base]['sslat'] - clat))
-    deltalon = np.radians(np.abs(rolo_angle_dict[rolo_base]['sslon'] - clon))
-    incidence = np.degrees(np.arccos(np.cos(deltalat) * np.cos(deltalon)))
-    return incidence
 
 # this line needed to get info from isis.campt
 content_re = re.compile(r'(Group.*End_Group)', re.DOTALL)
