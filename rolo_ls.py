@@ -7,7 +7,7 @@
 # ROLO image projection is 7 km/px orthographic
 # samples = 491 (columns)
 # lines = 467 (rows)
-# isis starts at 1
+
 # Sarah Braden
 # 6 September 2011
 
@@ -28,19 +28,12 @@ def write_image(value, filename):
         value: value you want to make an image for
         filename: output filename for the image
     """
-    # # python is ( line, sample )
-    # baseimg = scipy.zeros((467,491))    # a 491x467 array of float zeros
-    # # isis starts at 1, python starts at 0.
-    # # when converting into isis, the python 0,0 becomes isis 1,1
-    # # to fix this, we will subtract the sample, lines in the data table by 1
-    # samples = pix["sample"]-1
-    # lines = pix["line"]-1
-    # i=0
-    # print len(value)
-    # for i in range(0,len(value)):
-    #   baseimg[ lines[i] ][ samples[i] ] = value[i]
+    # python is (line, sample)
+    # isis starts at 1, python starts at 0.
+    # When converting into isis, the python 0,0 becomes isis 1,1
+    # to fix this, we will subtract the sample, lines in the data table by 1
 
-    baseimg = scipy.zeros(467 * 491)
+    baseimg = scipy.zeros(467 * 491) # a 491x467 array of float zeros
 
     lines = pix['line'] - 1
     samples = pix['sample'] - 1
@@ -86,7 +79,7 @@ def main():
 
     # calculate Lommel-Seeliger factor for each point
     # L-S = cos(i) / ( cos(e) + cos(i) )
-    LommelSeeliger = np.cos( np.radians(incidence) ) / ( np.cos( np.radians(emission) ) + np.cos( np.radians(incidence)))
+    LommelSeeliger = np.cos(np.radians(incidence))/(np.cos(np.radians(emission))+np.cos(np.radians(incidence)))
     # LS value at Sub Earth point
     LSsubearth = 0.4590 # I think I need to compute this for each image.
     # compute LS ratio for each point in image
