@@ -1,5 +1,7 @@
 #rolotools.py
 
+# put into new photometry module 
+
 import numpy as np
 from pysis.commands import isis
 from pysis.util import write_file_list, file_variations

@@ -1,39 +1,37 @@
-# pysistools.py
-from pysis.commands import isis
-from pysis.util import write_file_list, file_variations
-from pysis.labels import parse_file_label, parse_label
-import os
-import re
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
-
-# TODO: make a even/odd function that will perform a command for both even
-# and odd wac frames.
-
-content_re = re.compile(r'(Group.*End_Group)', re.DOTALL)
-
-'''
-pysistools or pyst
+"""
+pysistools
 Module for often used functions while scripting using pysis.
 To use: import pysistools as pyst
-'''
-def read_in_list(filename):    # Do I need this? can't I just glob?
+Eventually will become isistools.py
+"""
+
+import os, re
+import numpy as np
+import pandas as pd
+
+from pysis import isis, CubeFile
+from pysis.labels import parse_file_label, parse_label
+from pysis.util.file_manipulation import ImageName, write_file_list
+
+
+GROUP_RE = re.compile(r'(Group.*End_Group)', re.DOTALL)
+content_re = re.compile(r'(Group.*End_Group)', re.DOTALL)
+
+
+# Do I need this function? can't I just glob?
+def read_in_list(filename):    
     with open(filename) as f:
         lines = f.read().splitlines()
     return lines
-
 
 def create_mosaic(subname):
     os.system('ls '+subname+'*.proj.cub '+ subname+'*.proj.cub > proj.lis')
     isis.automos(fromlist=proj.lis, mosaic=subname+'.mos.cub')
     os.system('rm -f proj.lis') # CLEAN UP: there is a better way to run this
     pass
-
-
-def read_topo(img_name):
-    '''
-    Reads in either a fits or a isis .cub file.
-    '''
-
 
 def get_pixel_scale(img_name):
     '''
@@ -52,7 +50,7 @@ def get_img_center(img_name):
     clat = parse_label(output)['GroundPoint']['PlanetographicLatitude']
     return clat, clon
 
-
+# Maybe this should go in photometry module??
 def get_center_lat_lon(minlat, maxlat, minlon, maxlon):
     '''
     Input minimum and maximum latitude and longitude
@@ -61,10 +59,6 @@ def get_center_lat_lon(minlat, maxlat, minlon, maxlon):
     center_lat = minlat + abs(maxlat - minlat)/2
     center_lon = minlon + abs(maxlon - minlon)/2
     return center_lat, center_lon
-#def get_center_lat_lon(region): # old version
-#    minlat, maxlat = region[0], region[1]
-#    minlon, maxlon = region[2], region[3]
-
 
 def makemap(region, feature, scale, proj):
     '''
@@ -141,57 +135,54 @@ def process_frames(frames, color, name, model, feature):
     create_mosaic(subname)
 
 
-def get_image_info(filename):
-    '''
-    Runs catlab and gets the requested information
+# Version from lroc_wac_proc_cal.py
+def get_image_info(image):
+    """
+    GATHER INFORMATION ABOUT SINGLE OBSERVATION
+    BASED ON VIS mosaic only
+    """
+    # Get label info
+    label = parse_file_label(image)
+    instrument = label['IsisCube']['Instrument']
 
-    Input: full filename
-    
-    Returns: Dictionary
-    '''
-    output = isis.catlab.check_output(from_=img_name)
-    output = content_re.search(output).group(1)
-    obj = parse_label(output)['IsisCube']
-    #v1.6
-    #2011-10-10T13:45:31.791 ISO formatted date
-    data = {
-            'version_id': obj['Archive']['ProductVersionId']),
-            'exp_time':   obj['Instrument']['ExposureDuration'],
-            'fpa_temp':   obj['Instrument']['MiddleTemperatureFpa'],
-            'start_time': obj['Instrument']['StartTime'],
-            'samples':    obj['Dimensions']['Samples'],
-            'lines':      obj['Dimensions']['Lines'],
-            'bands':      obj['Dimensions']['Bands']
-            }
+    # Get campt info
+    output = isis.campt.check_output(from_=image)
+    gp = parse_label(GROUP_RE.search(output).group(1))['GroundPoint']
 
-    os.system('rm -f catlab.pvl') # CLEAN UP
+    return pd.Series({
+        'start_time':              instrument['StartTime'],
+        'exp_time':                instrument['ExposureDuration'],
+        'fpa_temp':                instrument['MiddleTemperatureFpa'],
+        'subsolar_azimuth':        gp['SubSolarAzimuth'],
+        'subsolar_ground_azimuth': gp['SubSolarGroundAzimuth'],
+        'solar_distance':          gp['SolarDistance']
+    })
 
-    return data
+def band_means(bands):
+    return bands.mean(axis=(1,2))
 
+def band_stds(bands):
+    return bands.std(axis=(1,2))
 
-def get_points_angles(img_name):
-    '''
-    Runs campt and gets the requested information
+def get_img_stats(name):
+    cube = CubeFile.open(name)
+    return band_means(cube.data), band_stds(cube.data)
 
-    Input: full filename
-    
-    Returns: Dictionary
-    ''' 
-    output = isis.campt.check_output(from_=img_name)
-    output = content_re.search(output).group(1)
-    gp = parse_label(output)['GroundPoint']
+def get_spectra(name):
+    uv_avgs, uv_stds = get_img_stats('{}.uv.mos.crop.cub'.format(name))
+    vis_avgs, vis_stds = get_img_stats('{}.vis.mos.crop.cub'.format(name))
 
-    pixel_scale = gp['SampleResolution']
-    subsolar_azimuth = gp['SubSolarAzimuth']
-    subsolar_ground_azimuth = gp['SubSolarGroundAzimuth']
-    solar_distance = gp['SolarDistance']
-    
-    data = {'subsolar_azimuth': float(subsolar_azimuth),
-            'subsolar_ground_azimuth': float(subsolar_ground_azimuth),
-            'solar_distance': float(solar_distance)
-            } # do I need this?
+    bands = [321, 360, 415, 566, 604, 643, 689]
 
-    os.system('rm -f campt.pvl') # CLEAN UP
-    # do I need to worry about campt.pvl files appending each other?
+    avgs = pd.Series(
+        data = np.concatenate([uv_avgs, vis_avgs]),
+        index = ['avg_{}'.format(band) for band in bands]
+    )
 
-    return data
+    stds = pd.Series(
+        data = np.concatenate([uv_stds, vis_stds]),
+        index = ['std_{}'.format(band) for band in bands]
+    )
+
+    return pd.concat([avgs, stds])
+
