@@ -7,51 +7,19 @@
 # ROLO image projection is 7 km/px orthographic
 # samples = 491 (columns)
 # lines = 467 (rows)
-# isis starts at 1
+
 # Sarah Braden
 # 6 September 2011
 
 import numpy as np
 from matplotlib import pyplot as plt
 import scipy
+import rolotools
 
 # MAIN TO-DO: Make the functions select the correct image_group
 
 # "mm185801.band0008.calmapcrop.cub"
 image_name = 'mm185801'
-
-def compute_emission_angles(image_name, angle_dict, image_data):
-    """ compute emission angles
-    
-    Args:
-        image_name: which set of images do we want angles for?
-        angle_dict: dictionary of angles for images
-        image_data: numpy array of image data
-
-    Returns:
-        emission angles for every point in the image.
-    """
-    deltalat = np.radians(np.abs(dictionary[image_name]['selat'] - pix['lat']))
-    deltalon = np.radians(np.abs(angle_dict[image_name]['selon'] - pix['lon']))
-    emission = np.degrees(np.arccos(np.cos(deltalat) * np.cos(deltalon)))
-    return emission
-
-def compute_incidence_angles(image_name, angle_dict, image_data):
-    """ compute incidence angles
-    
-    Args:
-        image_name: which set of images do we want angles for?
-        angle_dict: dictionary of angles for images
-        image_data: numpy array of image data
-
-    Returns:
-        incidence angles for every point in the image.
-    """
-    deltalat = np.radians(np.abs(angle_dict[image_name]['SSlat'] - pix['lat']))
-    deltalon = np.radians(np.abs(angle_dict[image_name]['SSlon'] - pix['lon']))
-    incidence = np.degrees(np.arccos(np.cos(deltalat) * np.cos(deltalon)))
-    return incidence
-
 
 def write_image(value, filename):
     """ write values in array to an ascii image
@@ -60,19 +28,12 @@ def write_image(value, filename):
         value: value you want to make an image for
         filename: output filename for the image
     """
-    # # python is ( line, sample )
-    # baseimg = scipy.zeros((467,491))    # a 491x467 array of float zeros
-    # # isis starts at 1, python starts at 0.
-    # # when converting into isis, the python 0,0 becomes isis 1,1
-    # # to fix this, we will subtract the sample, lines in the data table by 1
-    # samples = pix["sample"]-1
-    # lines = pix["line"]-1
-    # i=0
-    # print len(value)
-    # for i in range(0,len(value)):
-    #   baseimg[ lines[i] ][ samples[i] ] = value[i]
+    # python is (line, sample)
+    # isis starts at 1, python starts at 0.
+    # When converting into isis, the python 0,0 becomes isis 1,1
+    # to fix this, we will subtract the sample, lines in the data table by 1
 
-    baseimg = scipy.zeros(467 * 491)
+    baseimg = scipy.zeros(467 * 491) # a 491x467 array of float zeros
 
     lines = pix['line'] - 1
     samples = pix['sample'] - 1
@@ -96,6 +57,7 @@ def main():
       'names': ['filename','sample','line','lat','lon'],
       'formats': ['S64', 'f8','f8', 'f8', 'f8']
     }
+    # rolo_pix_data: numpy array of image data
     rolo_pix_data = np.loadtxt('rolo_s_l_lat_lon.csv', dtype=dtype, delimiter=',')
 
     dtype = {
@@ -104,14 +66,20 @@ def main():
     }
     angle = np.loadtxt('rolo_angle_info.csv', dtype=dtype, delimiter=',')
 
+    # rolo_angle_dict: dictionary of angles for images
     rolo_angle_dict = dict(zip(angle['imagename'], angle))
 
-    emission = compute_emission_angles(image_name, rolo_angle_dict, rolo_pix_data)
-    incidence = compute_incidence_angles(image_name, rolo_angle_dict, rolo_pix_data)
+    subearthlat = rolo_angle_dict[image_name]['selat']
+    subearthlon = rolo_angle_dict[image_name]['selon']
+    subsolarlat = rolo_angle_dict[image_name]['sslat']
+    subsolarlon = rolo_angle_dict[image_name]['sslon']
+    lat, lon = rolo_pix_data['lat'], rolo_pix_data['lon']
+    emission = rolotools.compute_emission(subearthlat, subearthlon, lat, lon)
+    incidence = rolotoos.compute_incidence(subsolarlat, subsolarlon, lat, lon)
 
     # calculate Lommel-Seeliger factor for each point
     # L-S = cos(i) / ( cos(e) + cos(i) )
-    LommelSeeliger = np.cos( np.radians(incidence) ) / ( np.cos( np.radians(emission) ) + np.cos( np.radians(incidence)))
+    LommelSeeliger = np.cos(np.radians(incidence))/(np.cos(np.radians(emission))+np.cos(np.radians(incidence)))
     # LS value at Sub Earth point
     LSsubearth = 0.4590 # I think I need to compute this for each image.
     # compute LS ratio for each point in image
