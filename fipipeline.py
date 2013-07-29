@@ -32,6 +32,13 @@ from darkroom import (
     identity,
 )
 
+import sys
+from os import path
+
+# adds the current path to the python path, so python can find
+# modules in the directory
+sys.path.insert(0, path.dirname(__file__))
+
 @img_mapper
 def lronac2isis(img_from, img_to, **options):
     isis.lronac2isis(from_=img_from, to=img_to)
