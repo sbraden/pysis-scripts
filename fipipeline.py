@@ -59,7 +59,7 @@ def trim(img_from, img_to, left=45, right=45, **options):
 def project(img_from, img_to, **options):
     with img_from.make_child(ext='map') as mapfile:
         with img_from.make_child(ext='lis') as fromlist:
-            write_file_list(fromlist, [img_from])
+            write_file_list(unicode(fromlist), [img_from])
 
             isis.mosrange(
                 fromlist   = fromlist,
