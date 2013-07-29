@@ -14,6 +14,13 @@ Options:
   --caption=CAPTION  A short caption for the post.
 
 """
+import sys
+from os import path
+
+# adds the current path to the python path, so python can find
+# modules in the directory
+sys.path.insert(0, path.dirname(__file__))
+
 import os
 import yaml
 from docopt import docopt
@@ -31,13 +38,6 @@ from darkroom import (
     mapper,
     identity,
 )
-
-import sys
-from os import path
-
-# adds the current path to the python path, so python can find
-# modules in the directory
-sys.path.insert(0, path.dirname(__file__))
 
 @img_mapper(ext='cub')
 def lronac2isis(img_from, img_to, **options):
