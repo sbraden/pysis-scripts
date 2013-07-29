@@ -82,7 +82,7 @@ def name_image(image, ext, strip_ext='', **options):
         name = image
 
     name = rename(name, ext, strip_ext)
-    os.rename(image, name)
+    os.rename(unicode(image), name)
 
     if isinstance(image, TempImage):
         image.cleanup(propagate=True)
