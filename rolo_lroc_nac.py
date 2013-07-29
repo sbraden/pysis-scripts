@@ -6,8 +6,8 @@ from pysis.commands import isis
 from pysis.util import write_file_list, file_variations
 from pysis.labels import parse_file_label, parse_label
 import numpy as np
+import scipy
 import rolotools
-import scipy5
 
 # Sarah Braden
 # 4/3/2012
@@ -27,7 +27,7 @@ NAC_type = 'pri'
 # .map files go in nacdir
 nacdir = '/home/sbraden/NACCAL/' + rolo_set + NAC_type
 # ROLO directory
-rolodir = '/home/sbraden/ROLO/' + rolo_set + rolo_subset
+rolodir = '/home/sbraden/ROLO/calibrated/' + rolo_base
 
 
 def photomet_rolo(img_name, rolo_angle_dict):
@@ -112,12 +112,12 @@ def multispec_rolo(img_name):
         by NAC image.
     """
     rolo_images = iglob(rolodir + '/footprints/*.cub') 
-        for rolo_image in rolo_images:
-            isis.stats(from_=rolo_image, to=rolo_image + '.stat')
-            # needs to be updated for new pysis
-            results = parse_file_header(rolo_image + '.stat')['Results']
-            avg = results['Average']
-            stdev = results['StandardDeviation']
+    for rolo_image in rolo_images:
+        isis.stats(from_=rolo_image, to=rolo_image + '.stat')
+        # needs to be updated for new pysis
+        results = parse_file_header(rolo_image + '.stat')['Results']
+        avg = results['Average']
+        stdev = results['StandardDeviation']
 
 
 def main():
