@@ -150,7 +150,7 @@ def main():
     ])
 
     images = ImageList(opts['<images>'])
-    pipeline.run(images)
+    pipeline.run(images, default_ext='cub')
 
 
 if __name__ == '__main__':
