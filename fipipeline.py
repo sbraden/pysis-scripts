@@ -39,7 +39,7 @@ from os import path
 # modules in the directory
 sys.path.insert(0, path.dirname(__file__))
 
-@img_mapper
+@img_mapper(ext='cub')
 def lronac2isis(img_from, img_to, **options):
     isis.lronac2isis(from_=img_from, to=img_to)
 
@@ -47,18 +47,18 @@ def lronac2isis(img_from, img_to, **options):
 def spiceinit(image, **options):
     isis.spiceinit(from_=image)
 
-@img_mapper
+@img_mapper(ext='cal.cub')
 def lronaccal(img_from, img_to, **options):
     isis.lronaccal(from_=img_from, to=img_to)
 
-@img_mapper
+@img_mapper(ext='trim.cub')
 def trim(img_from, img_to, left=45, right=45, **options):
     isis.trim(from_=img_from, to=img_to, left=left, right=right)
 
-@img_mapper
+@img_mapper(ext='proj.cub')
 def project(img_from, img_to, **options):
-    with img_from.make_child(ext='map') as mapfile:
-        with img_from.make_child(ext='lis') as fromlist:
+    with img_from.make_child('map') as mapfile:
+        with img_from.make_child('lis') as fromlist:
             write_file_list(unicode(fromlist), [unicode(img_from)])
 
             isis.mosrange(
@@ -76,8 +76,8 @@ def project(img_from, img_to, **options):
         )
 
 def rename(image, ext, strip_ext=''):
-    if name.endswith(trim_ext):
-        name = name[:-len(trim_ext)]
+    if name.endswith(strip_ext):
+        name = name[:-len(strip_ext)]
 
     return name + ext
 
