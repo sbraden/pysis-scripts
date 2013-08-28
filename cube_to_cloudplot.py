@@ -31,7 +31,7 @@ colours = [
   'lightgreen'
 ]
 
-colorloop=intertools.cycle(colors) # using intertools!
+colorloop=itertools.cycle(colors) # using intertools!
 
 
 def make_cloud_plot(wac_df, clm_df):
