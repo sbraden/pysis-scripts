@@ -13,7 +13,7 @@ from os.path import basename
 from matplotlib import pyplot as plt
 from matplotlib.font_manager import FontProperties
 
-
+# on martini.local
 source_dir = '/home/sbraden/lunar_rois/matching_cubes/'
 
 # Colors will be applyed to filters by filter in alphabetical ordear
