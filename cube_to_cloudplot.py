@@ -55,7 +55,7 @@ def make_cloud_plot(wac_df, clm_df):
     plt.close()
 
 
-def make_cross_plot(wac_df, clm_df):
+def make_cross_plot(wac_df, clm_df, mare_wac_df, mare_clm_df, pyro_wac_df, pyro_clm_df):
     '''
     x = 320/415
     y = 950/750
@@ -70,6 +70,26 @@ def make_cross_plot(wac_df, clm_df):
         plt.errorbar(np.mean(x_data), np.mean(y_data), xerr=np.std(x_data),
             yerr=np.std(y_data), marker='o', label=(roi_name), 
             c=colorloop.next())
+
+    for index_name in mare_wac_df.index:
+        roi_name = index_name[:-4]
+        x = wac_df.loc[index_name].values
+        y = clm_df.loc[roi_name+'_clm'].values
+        x_data = np.ma.masked_array(x[0],np.isnan(x[0]))
+        y_data = np.ma.masked_array(y[0],np.isnan(y[0]))
+        plt.errorbar(np.mean(x_data), np.mean(y_data), xerr=np.std(x_data),
+            yerr=np.std(y_data), marker='D', label=(roi_name), 
+            c='cyan')
+
+    for index_name in pyro_wac_df.index:
+        roi_name = index_name[:-4]
+        x = wac_df.loc[index_name].values
+        y = clm_df.loc[roi_name+'_clm'].values
+        x_data = np.ma.masked_array(x[0],np.isnan(x[0]))
+        y_data = np.ma.masked_array(y[0],np.isnan(y[0]))
+        plt.errorbar(np.mean(x_data), np.mean(y_data), xerr=np.std(x_data),
+            yerr=np.std(y_data), marker='^', label=(roi_name), 
+            c='burlywood')
 
     rois_rough = pd.read_csv('/home/sbraden/imps_ratio_rough.csv', index_col=0)
     rois_mare = pd.read_csv('/home/sbraden/imps_ratio_mare.csv', index_col=0)
@@ -136,18 +156,31 @@ def get_banddata(image_list):
 
 def main():
 
+    # read in pyroclastic deposits
+    pyro_wac_img_list = iglob('~/lunar_rois/matching_cubes/pyros/*_wac.cub')
+    pyro_clm_img_list = iglob('~/lunar_rois/matching_cubes/pyros/*_clm.cub')
+
+    pyro_wac_df = get_banddata(pyro_wac_img_list)
+    pyro_clm_df = get_banddata(pyro_clm_img_list)
+
+    #read in mare deposits
+    mare_wac_img_list = iglob('~/lunar_rois/matching_cubes/mare/*_wac.cub')
+    mare_clm_img_list = iglob('~/lunar_rois/matching_cubes/mare/*_clm.cub')
+
+    mare_wac_df = get_banddata(mare_wac_img_list)
+    mare_clm_df = get_banddata(mare_clm_img_list)
+
     # read in WAC images
     wac_img_list = iglob('*_wac.cub')
-
     # read in clementine images
     clm_img_list = iglob('*_clm.cub')
 
     wac_df = get_banddata(wac_img_list)
-    print wac_df # debug
+
     clm_df = get_banddata(clm_img_list)
-    print clm_df # debug
+
     #make_cloud_plot(wac_df, clm_df)
-    make_cross_plot(wac_df, clm_df)
+    make_cross_plot(wac_df, clm_df, mare_wac_df, mare_clm_df, pyro_wac_df, pyro_clm_df)
 
 if __name__ == '__main__':
     main()
