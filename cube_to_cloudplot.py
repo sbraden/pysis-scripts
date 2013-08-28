@@ -138,7 +138,7 @@ def main():
 
     # read in WAC images
     wac_img_list = iglob('*_wac.cub')
-    print wac_img_list
+
     # read in clementine images
     clm_img_list = iglob('*_clm.cub')
 
@@ -146,7 +146,7 @@ def main():
     print wac_df # debug
     clm_df = get_banddata(clm_img_list)
     print clm_df # debug
-    make_cloud_plot(wac_df, clm_df)
+    #make_cloud_plot(wac_df, clm_df)
     make_cross_plot(wac_df, clm_df)
 
 if __name__ == '__main__':
