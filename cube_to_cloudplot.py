@@ -67,7 +67,7 @@ def make_cross_plot(wac_df, clm_df):
         y = clm_df.loc[roi_name+'_clm'].values
         x_data = np.ma.masked_array(x[0],np.isnan(x[0]))
         y_data = np.ma.masked_array(y[0],np.isnan(y[0]))
-        print roi_name, np.mean(x_data), np.mean(y_data), xerr=np.std(x_data), yerr=np.std(y_data)
+        print roi_name, np.mean(x_data), np.mean(y_data), np.std(x_data), np.std(y_data)
         plt.errorbar(np.mean(x_data), np.mean(y_data), xerr=np.std(x_data),
             yerr=np.std(y_data), marker='o', label=(roi_name), 
             c=colorloop.next())
