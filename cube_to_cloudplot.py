@@ -105,13 +105,15 @@ def clem_or_wac(img_name):
         wac_415 = image.apply_numpy_specials()[2].T
         # tell pandas to handle the very negative numbers
         wac_320_over_415 = wac_320/wac_415
-        return img_name[-7:-4], wac_320_over_415
+        #return img_name[-7:-4], wac_320_over_415
+        return img_name[-7:-4], wac_320
     elif img_name[-7:-4] == 'clm':
         clm_950 = image.apply_numpy_specials()[3].T
         clm_750 = image.apply_numpy_specials()[1].T
         clm_950_over_750 = clm_950/clm_750
         # tell pandas to handle the very negative numbers
-        return img_name[-7:-4], clm_950_over_750
+        #return img_name[-7:-4], clm_950_over_750
+        return img_name[-7:-4], clm_950
     else:
         print 'This is not a input cube that works with this script.'
 
