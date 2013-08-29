@@ -158,6 +158,7 @@ def main():
 
     # read in pyroclastic deposits
     pyro_wac_img_list = iglob('pyros/*_wac.cub')
+    print pyro_wac_img_list
     pyro_clm_img_list = iglob('pyros/*_clm.cub')
 
     pyro_wac_df = get_banddata(pyro_wac_img_list)
