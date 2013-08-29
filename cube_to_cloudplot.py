@@ -61,16 +61,6 @@ def make_cross_plot(wac_df, clm_df, mare_wac_df, mare_clm_df, pyro_wac_df, pyro_
     y = 950/750
     '''
 
-    for index_name in wac_df.index:
-        roi_name = index_name[:-4]
-        x = wac_df.loc[index_name].values
-        y = clm_df.loc[roi_name+'_clm'].values
-        x_data = np.ma.masked_array(x[0],np.isnan(x[0]))
-        y_data = np.ma.masked_array(y[0],np.isnan(y[0]))
-        plt.errorbar(np.mean(x_data), np.mean(y_data), xerr=np.std(x_data),
-            yerr=np.std(y_data), marker='o', label=(roi_name), 
-            c=colorloop.next())
-
     for index_name in mare_wac_df.index:
         roi_name = index_name[:-4]
         x = mare_wac_df.loc[index_name].values
@@ -80,6 +70,16 @@ def make_cross_plot(wac_df, clm_df, mare_wac_df, mare_clm_df, pyro_wac_df, pyro_
         plt.errorbar(np.mean(x_data), np.mean(y_data), xerr=np.std(x_data),
             yerr=np.std(y_data), marker='D', label=(roi_name), 
             c='cyan')
+
+    for index_name in wac_df.index:
+        roi_name = index_name[:-4]
+        x = wac_df.loc[index_name].values
+        y = clm_df.loc[roi_name+'_clm'].values
+        x_data = np.ma.masked_array(x[0],np.isnan(x[0]))
+        y_data = np.ma.masked_array(y[0],np.isnan(y[0]))
+        plt.errorbar(np.mean(x_data), np.mean(y_data), xerr=np.std(x_data),
+            yerr=np.std(y_data), marker='o', label=(roi_name), 
+            c=colorloop.next())
 
     for index_name in pyro_wac_df.index:
         roi_name = index_name[:-4]
