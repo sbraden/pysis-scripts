@@ -61,16 +61,6 @@ def make_cross_plot(wac_df, clm_df, mare_wac_df, mare_clm_df, pyro_wac_df, pyro_
     y = 950/750
     '''
 
-    for index_name in mare_wac_df.index:
-        roi_name = index_name[:-4]
-        x = mare_wac_df.loc[index_name].values
-        y = mare_clm_df.loc[roi_name+'_clm'].values
-        x_data = np.ma.masked_array(x[0],np.isnan(x[0]))
-        y_data = np.ma.masked_array(y[0],np.isnan(y[0]))
-        plt.errorbar(np.mean(x_data), np.mean(y_data), xerr=np.std(x_data),
-            yerr=np.std(y_data), marker='D', label=(roi_name), 
-            c='cyan')
-
     for index_name in wac_df.index:
         roi_name = index_name[:-4]
         x = wac_df.loc[index_name].values
@@ -80,16 +70,6 @@ def make_cross_plot(wac_df, clm_df, mare_wac_df, mare_clm_df, pyro_wac_df, pyro_
         plt.errorbar(np.mean(x_data), np.mean(y_data), xerr=np.std(x_data),
             yerr=np.std(y_data), marker='o', label=(roi_name), 
             c=colorloop.next())
-
-    for index_name in pyro_wac_df.index:
-        roi_name = index_name[:-4]
-        x = pyro_wac_df.loc[index_name].values
-        y = pyro_clm_df.loc[roi_name+'_clm'].values
-        x_data = np.ma.masked_array(x[0],np.isnan(x[0]))
-        y_data = np.ma.masked_array(y[0],np.isnan(y[0]))
-        plt.errorbar(np.mean(x_data), np.mean(y_data), xerr=np.std(x_data),
-            yerr=np.std(y_data), marker='^', label=(roi_name), 
-            c='burlywood')
 
     rois_rough = pd.read_csv('/home/sbraden/imps_ratio_rough.csv', index_col=0)
     rois_mare = pd.read_csv('/home/sbraden/imps_ratio_mare.csv', index_col=0)
@@ -155,21 +135,6 @@ def get_banddata(image_list):
 
 
 def main():
-
-    # read in pyroclastic deposits
-    pyro_wac_img_list = iglob('pyros/*_wac.cub')
-    print pyro_wac_img_list
-    pyro_clm_img_list = iglob('pyros/*_clm.cub')
-
-    pyro_wac_df = get_banddata(pyro_wac_img_list)
-    pyro_clm_df = get_banddata(pyro_clm_img_list)
-
-    #read in mare deposits
-    mare_wac_img_list = iglob('mare/*_wac.cub')
-    mare_clm_img_list = iglob('mare/*_clm.cub')
-
-    mare_wac_df = get_banddata(mare_wac_img_list)
-    mare_clm_df = get_banddata(mare_clm_img_list)
 
     # read in WAC images
     wac_img_list = iglob('*_wac.cub')
