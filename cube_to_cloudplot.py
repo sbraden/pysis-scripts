@@ -157,15 +157,15 @@ def get_banddata(image_list):
 def main():
 
     # read in pyroclastic deposits
-    pyro_wac_img_list = iglob('~/lunar_rois/matching_cubes/pyros/*_wac.cub')
-    pyro_clm_img_list = iglob('~/lunar_rois/matching_cubes/pyros/*_clm.cub')
+    pyro_wac_img_list = iglob('/home/sbraden/lunar_rois/matching_cubes/pyros/*_wac.cub')
+    pyro_clm_img_list = iglob('/home/sbraden/lunar_rois/matching_cubes/pyros/*_clm.cub')
 
     pyro_wac_df = get_banddata(pyro_wac_img_list)
     pyro_clm_df = get_banddata(pyro_clm_img_list)
 
     #read in mare deposits
-    mare_wac_img_list = iglob('~/lunar_rois/matching_cubes/mare/*_wac.cub')
-    mare_clm_img_list = iglob('~/lunar_rois/matching_cubes/mare/*_clm.cub')
+    mare_wac_img_list = iglob('/home/sbraden/lunar_rois/matching_cubes/mare/*_wac.cub')
+    mare_clm_img_list = iglob('/home/sbraden/lunar_rois/matching_cubes/mare/*_clm.cub')
 
     mare_wac_df = get_banddata(mare_wac_img_list)
     mare_clm_df = get_banddata(mare_clm_img_list)
