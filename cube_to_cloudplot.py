@@ -55,7 +55,7 @@ def make_cloud_plot(wac_df, clm_df):
     plt.close()
 
 
-def make_cross_plot(wac_df, clm_df, mare_wac_df, mare_clm_df, pyro_wac_df, pyro_clm_df):
+def make_cross_plot(wac_df, clm_df):
     '''
     x = 320/415
     y = 950/750
@@ -67,6 +67,7 @@ def make_cross_plot(wac_df, clm_df, mare_wac_df, mare_clm_df, pyro_wac_df, pyro_
         y = clm_df.loc[roi_name+'_clm'].values
         x_data = np.ma.masked_array(x[0],np.isnan(x[0]))
         y_data = np.ma.masked_array(y[0],np.isnan(y[0]))
+        print roi_name, np.mean(x_data), np.mean(y_data), xerr=np.std(x_data), yerr=np.std(y_data)
         plt.errorbar(np.mean(x_data), np.mean(y_data), xerr=np.std(x_data),
             yerr=np.std(y_data), marker='o', label=(roi_name), 
             c=colorloop.next())
@@ -146,7 +147,7 @@ def main():
     clm_df = get_banddata(clm_img_list)
 
     #make_cloud_plot(wac_df, clm_df)
-    make_cross_plot(wac_df, clm_df, mare_wac_df, mare_clm_df, pyro_wac_df, pyro_clm_df)
+    make_cross_plot(wac_df, clm_df)
 
 if __name__ == '__main__':
     main()
