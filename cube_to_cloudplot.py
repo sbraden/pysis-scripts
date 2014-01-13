@@ -138,6 +138,7 @@ def get_banddata(image_list):
         index.append(basename(img_name[:-4]))
         data.append(ratio_array)
 
+    print 'applied scaling and transposing'
     return pd.DataFrame(data, index=index)
 
 
