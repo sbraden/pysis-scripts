@@ -3,6 +3,9 @@
 '''
 Take a number of cubes and make them into a cloud plot.
 
+Note to self. You are suppose to run this in the directory 
+with the files (TODO: fix this later)
+
 TODO: write in a function to recognize when filenames are
 too long for matplotlib to handle.
 '''
