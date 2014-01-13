@@ -14,7 +14,8 @@ from matplotlib import pyplot as plt
 from matplotlib.font_manager import FontProperties
 
 # on martini.local
-source_dir = '/home/sbraden/lunar_rois/matching_cubes/'
+#source_dir = '/home/sbraden/lunar_rois/matching_cubes/'
+source_dir = 'home/sbraden/400mpp_coreg_wac_clm'
 
 # Colors will be applyed to filters by filter in alphabetical ordear
 colors = [
@@ -97,6 +98,9 @@ def clem_or_wac(img_name):
     Reads in image, reads extension,
     Python arrays are y, x instead of isis x, y => take the transpose of the
     image data array  
+    totally rewrite this so that the function only does 1 thing,
+    not two. Ideally the function should only differentiate between
+    wac and clm files, not do math.
     '''
     image = CubeFile.open(source_dir+img_name) # pysis.cubefile.CubeFile
 
@@ -148,8 +152,8 @@ def main():
 
     clm_df = get_banddata(clm_img_list)
 
-    #make_cloud_plot(wac_df, clm_df)
-    make_cross_plot(wac_df, clm_df)
+    make_cloud_plot(wac_df, clm_df)
+    #make_cross_plot(wac_df, clm_df)
 
 if __name__ == '__main__':
     main()
