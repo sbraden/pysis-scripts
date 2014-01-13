@@ -2,6 +2,9 @@
 
 '''
 Take a number of cubes and make them into a cloud plot.
+
+TODO: write in a function to recognize when filenames are
+too long for matplotlib to handle.
 '''
 import itertools
 import numpy as np
@@ -49,7 +52,7 @@ def make_cloud_plot(wac_df, clm_df):
 
     fontP = FontProperties()
     fontP.set_size('small')
-    #plt.legend(loc='lower right', fancybox=True, prop=fontP, scatterpoints=1)
+    plt.legend(loc='lower right', fancybox=True, prop=fontP, scatterpoints=1)
     plt.xlabel('320/415 nm WAC ratio', fontsize=14)
     plt.ylabel('950/750 nm CLM ratio', fontsize=14)
     plt.savefig('lunar_roi_cloud_plot.png', dpi=300)
