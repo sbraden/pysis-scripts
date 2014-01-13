@@ -115,6 +115,7 @@ def clem_or_wac(img_name):
         wac_415 = image.apply_numpy_specials()[2].T
         # tell pandas to handle the very negative numbers
         wac_320_over_415 = wac_320/wac_415
+        print wac_320_over_415
         return img_name[-7:-4], wac_320_over_415
         #return img_name[-7:-4], wac_415
     elif img_name[-7:-4] == 'clm':
