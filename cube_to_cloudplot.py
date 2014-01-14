@@ -55,24 +55,24 @@ def make_cloud_plot(image_list):
     Just pass one of the image_list s
     '''
     for img_name in image_list:
-        basename = img_name[:-4]
-        roi_name = basename[:-4]
+        roi_name = img_name[:-8]
         image1 = CubeFile.open(source_dir+img_name) # pysis.cubefile.CubeFile
         wac_320 = image1.apply_numpy_specials()[0].T
         image2 = CubeFile.open(source_dir+roi_name+'_clm.cub') # pysis.cubefile.CubeFile
         clm_750 = image2.apply_numpy_specials()[1].T
+        clm_950 = image2.apply_numpy_specials()[3].T
         clm_415 = image2.apply_numpy_specials()[0].T
 
-        xaxis = clm_415
-        yaxis = clm_750
+        xaxis = clm_750
+        yaxis = clm_950/clm_750
 
         plt.scatter(xaxis, yaxis, marker='o', label=(roi_name), c=colorloop.next())
 
     fontP = FontProperties()
     fontP.set_size('small')
     plt.legend(loc='lower right', fancybox=True, prop=fontP, scatterpoints=1)
-    plt.xlabel('320/415 nm WAC ratio test', fontsize=14)
-    plt.ylabel('950/750 nm CLM ratio test', fontsize=14)
+    plt.xlabel('CLM 750 nm', fontsize=14)
+    plt.ylabel('CLM 950/750 nm', fontsize=14)
     plt.savefig('lunar_roi_cloud_plot.png', dpi=300)
     plt.close()
 
