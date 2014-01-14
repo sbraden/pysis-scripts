@@ -58,11 +58,12 @@ def make_cloud_plot(image_list):
         basename = img_name[:-4]
         roi_name = basename[:-4]
         image1 = CubeFile.open(source_dir+img_name) # pysis.cubefile.CubeFile
-        wac_320 = image1.apply_numpy_specials()[0].astype(np.float64)
+        wac_320 = image1.apply_numpy_specials()[0].T
         image2 = CubeFile.open(source_dir+roi_name+'_clm.cub') # pysis.cubefile.CubeFile
         clm_750 = image2.apply_numpy_specials()[1].T
+        clm_415 = image2.apply_numpy_specials()[0].T
 
-        xaxis = wac_320
+        xaxis = clm_415
         yaxis = clm_750
 
         plt.scatter(xaxis, yaxis, marker='o', label=(roi_name), c=colorloop.next())
