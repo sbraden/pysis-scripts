@@ -123,6 +123,7 @@ def clem_or_wac(img_name):
         clm_950 = image.apply_numpy_specials()[3].T
         clm_750 = image.apply_numpy_specials()[1].T
         clm_950_over_750 = clm_950/clm_750
+        print clm_950
         # tell pandas to handle the very negative numbers
         return img_name[-7:-4], clm_950_over_750
         #return img_name[-7:-4], clm_750
