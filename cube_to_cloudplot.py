@@ -37,7 +37,7 @@ colors = [
   'hotpink',
   'maroon',
   'magenta',
-  'mediumvoletred',
+  'red',
   'blue',
   'green',
   'burlywood',
@@ -46,8 +46,7 @@ colors = [
   'black',
   'darkorange',
   'purple',
-  'lightgreen',
-  'red'
+  'lightgreen'
 ]
 
 colorloop=itertools.cycle(colors) # using intertools!
