@@ -23,6 +23,15 @@ from matplotlib.font_manager import FontProperties
 #source_dir = '/home/sbraden/lunar_rois/matching_cubes/'
 source_dir = '/home/sbraden/400mpp_coreg_wac_clm/'
 
+x1= 320
+x2= 415
+
+y1= 950
+y2= 750
+
+x = x1/x2
+y = y1/y2
+
 # Colors will be applyed to filters by filter in alphabetical ordear
 colors = [
   'red',
@@ -41,23 +50,28 @@ colors = [
 colorloop=itertools.cycle(colors) # using intertools!
 
 
-def make_cloud_plot(wac_df, clm_df):
+def make_cloud_plot(image_list):
+    '''   
+    Just pass one of the image_list s
     '''
-    x = 320/415
-    y = 950/750
-    '''
+    for img_name in image_list:
+        basename = img_name[:-4]
+        roi_name = basename[:-4]
+        image1 = CubeFile.open(source_dir+img_name) # pysis.cubefile.CubeFile
+        wac_320 = image1.apply_numpy_specials()[0].T
+        image2 = CubeFile.open(source_dir+roi_name+'_clm.cub') # pysis.cubefile.CubeFile
+        clm_750 = image2.apply_numpy_specials()[1].T
 
-    for index_name in wac_df.index:
-        roi_name = index_name[:-4]
-        x = wac_df.loc[index_name].values
-        y = clm_df.loc[roi_name+'_clm'].values
-        plt.scatter(x[0], y[0], marker='o', label=(roi_name), c=colorloop.next())
+        xaxis = wac_320
+        yaxis = clm_750
+
+        plt.scatter(xaxis, yaxis, marker='o', label=(roi_name), c=colorloop.next())
 
     fontP = FontProperties()
     fontP.set_size('small')
     plt.legend(loc='lower right', fancybox=True, prop=fontP, scatterpoints=1)
-    plt.xlabel('320/415 nm WAC ratio', fontsize=14)
-    plt.ylabel('950/750 nm CLM ratio', fontsize=14)
+    plt.xlabel('320/415 nm WAC ratio test', fontsize=14)
+    plt.ylabel('950/750 nm CLM ratio test', fontsize=14)
     plt.savefig('lunar_roi_cloud_plot.png', dpi=300)
     plt.close()
 
@@ -147,6 +161,7 @@ def get_banddata(image_list):
         camera, ratio_array = clem_or_wac(img_name)
         index.append(basename(img_name[:-4]))
         data.append(ratio_array)
+        print data
 
     print 'applied scaling and transposing'
     return pd.DataFrame(data, index=index)
@@ -159,11 +174,12 @@ def main():
     # read in clementine images
     clm_img_list = iglob('*_clm.cub')
 
-    clm_df = get_banddata(clm_img_list)
+    #clm_df = get_banddata(clm_img_list)
 
-    wac_df = get_banddata(wac_img_list)
+    #wac_df = get_banddata(wac_img_list)
 
-    make_cloud_plot(wac_df, clm_df)
+    #make_cloud_plot(wac_df, clm_df)
+    make_cloud_plot(wac_img_list)
     #make_cross_plot(wac_df, clm_df)
 
 if __name__ == '__main__':
