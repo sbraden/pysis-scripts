@@ -34,10 +34,10 @@ y = y1/y2
 
 # Colors will be applyed to filters by filter in alphabetical ordear
 colors = [
-  'red',
-  'lightred',
-  'pink',
+  'hotpink',
+  'maroon',
   'magenta',
+  'mediumvoletred',
   'blue',
   'green',
   'burlywood',
@@ -46,7 +46,8 @@ colors = [
   'black',
   'darkorange',
   'purple',
-  'lightgreen'
+  'lightgreen',
+  'red'
 ]
 
 colorloop=itertools.cycle(colors) # using intertools!
