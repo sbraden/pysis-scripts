@@ -142,6 +142,7 @@ def get_banddata(image_list):
     data = []
 
     for img_name in image_list:
+        print img_name
         camera, ratio_array = clem_or_wac(img_name)
         index.append(basename(img_name[:-4]))
         data.append(ratio_array)
