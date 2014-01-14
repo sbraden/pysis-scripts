@@ -64,7 +64,7 @@ def make_cloud_plot(image_list):
         clm_415 = image2.apply_numpy_specials()[0].T
 
         xaxis = clm_750
-        yaxis = clm_950/clm_750
+        yaxis = clm_415/clm_750
 
         plt.scatter(xaxis, yaxis, marker='o', label=(roi_name), c=colorloop.next())
 
@@ -72,7 +72,7 @@ def make_cloud_plot(image_list):
     fontP.set_size('small')
     plt.legend(loc='lower right', fancybox=True, prop=fontP, scatterpoints=1)
     plt.xlabel('CLM 750 nm', fontsize=14)
-    plt.ylabel('CLM 950/750 nm', fontsize=14)
+    plt.ylabel('CLM 415/750 nm', fontsize=14)
     plt.savefig('lunar_roi_cloud_plot.png', dpi=300)
     plt.close()
 
