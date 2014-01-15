@@ -69,9 +69,10 @@ def make_cloud_plot(image_list, color, groupname):
         xaxis = wac_320/wac_415
         yaxis = clm_950/clm_750
 
+        coloriter = colorloop.next()
         #plt.scatter(xaxis, yaxis, marker='o', label=(roi_name), c=colorloop.next())
         #plt.scatter(xaxis, yaxis, marker='.', label=(roi_name), c=color, edgecolor=color)
-        plt.scatter(xaxis, yaxis, marker='.', label=(roi_name), c=colorloop.next(), edgecolor=c)
+        plt.scatter(xaxis, yaxis, marker='.', label=(roi_name), c=coloriter, edgecolor=coloriter)
 
 
 def make_cross_plot(wac_df, clm_df):
