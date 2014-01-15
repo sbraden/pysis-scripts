@@ -171,7 +171,7 @@ def main():
     # Write a part to put image directories into "groups"
     source_dirs = [
         '/home/sbraden/400mpp_15x15_clm_wac/mare/',
-         '/home/sbraden/400mpp_15x15_clm_wac/pyro/',
+        '/home/sbraden/400mpp_15x15_clm_wac/pyro/',
         '/home/sbraden/400mpp_15x15_clm_wac/imps/'
         ]
 
