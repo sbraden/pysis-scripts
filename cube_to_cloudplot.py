@@ -10,6 +10,7 @@ TODO: write in a function to recognize when filenames are
 too long for matplotlib to handle.
 '''
 import itertools
+import os.path
 import numpy as np
 import pandas as pd
 from pysis import isis
@@ -21,7 +22,7 @@ from matplotlib.font_manager import FontProperties
 
 # on martini.local
 #source_dir = '/home/sbraden/lunar_rois/matching_cubes/'
-source_dir = '/home/sbraden/400mpp_immaturemare_6x6/'
+#source_dir = '/home/sbraden/400mpp_immaturemare_6x6/'
 
 x1= 320
 x2= 415
@@ -34,9 +35,6 @@ y = y1/y2
 
 # Colors will be applyed to filters by filter in alphabetical ordear
 colors = [
-  'hotpink',
-  'maroon',
-  'magenta',
   'red',
   'blue',
   'green',
@@ -52,14 +50,15 @@ colors = [
 colorloop=itertools.cycle(colors) # using intertools!
 
 
-def make_cloud_plot(image_list):
+def make_cloud_plot(image_list, color, groupname):
     '''   
-    Just pass one of the image_list s
+    Just pass one of the image_list
     '''
     for img_name in image_list:
         roi_name = img_name[:-8]
         image1 = CubeFile.open(source_dir+img_name) # pysis.cubefile.CubeFile
         wac_320 = image1.apply_numpy_specials()[0].T
+        wac_360 = image1.apply_numpy_specials()[1].T
         wac_415 = image1.apply_numpy_specials()[2].T
         image2 = CubeFile.open(source_dir+roi_name+'_clm.cub') # pysis.cubefile.CubeFile
         clm_750 = image2.apply_numpy_specials()[1].T
@@ -69,15 +68,8 @@ def make_cloud_plot(image_list):
         xaxis = wac_320/wac_415
         yaxis = clm_950/clm_750
 
-        plt.scatter(xaxis, yaxis, marker='o', label=(roi_name), c=colorloop.next())
-
-    fontP = FontProperties()
-    fontP.set_size('small')
-    plt.legend(loc='lower right', fancybox=True, prop=fontP, scatterpoints=1)
-    plt.xlabel('WAC 320/415 nm', fontsize=14)
-    plt.ylabel('CLM 950/750 nm', fontsize=14)
-    plt.savefig('lunar_roi_cloud_plot.png', dpi=300)
-    plt.close()
+        #plt.scatter(xaxis, yaxis, marker='o', label=(roi_name), c=colorloop.next())
+        plt.scatter(xaxis, yaxis, marker='o', label=(groupname), c=color)
 
 
 def make_cross_plot(wac_df, clm_df):
@@ -173,18 +165,34 @@ def get_banddata(image_list):
 
 def main():
 
-    # read in WAC images
-    wac_img_list = iglob('*_wac.cub')
-    # read in clementine images
-    clm_img_list = iglob('*_clm.cub')
+    # Write a part to put image directories into "groups"
+    source_dirs = [
+        '/home/sbraden/400mpp_15x15_clm_wac/mare/',
+        '/home/sbraden/400mpp_15x15_clm_wac/pyro/',
+        '/home/sbraden/400mpp_15x15_clm_wac/imps/',
+        ]
 
-    #clm_df = get_banddata(clm_img_list)
+    for directory in source_dirs:
+        
+        print directory
+        groupname = os.path.split(os.path.dirname(directory))[1]
+        print groupname
+        # read in LROC WAC images
+        wac_img_list = iglob(directory+'*_wac.cub')
+        # read in Clementine images
+        clm_img_list = iglob(directory+'*_clm.cub')
 
-    #wac_df = get_banddata(wac_img_list)
+        make_cloud_plot(wac_img_list, colorloop.next(), groupname)
 
-    #make_cloud_plot(wac_df, clm_df)
-    make_cloud_plot(wac_img_list)
-    #make_cross_plot(wac_df, clm_df)
+    fontP = FontProperties()
+    fontP.set_size('small')
+    plt.legend(loc='lower right', fancybox=True, prop=fontP, scatterpoints=1)
+    plt.xlabel('WAC 320/415 nm', fontsize=14)
+    plt.ylabel('CLM 950/750 nm', fontsize=14)
+    plt.savefig('lunar_roi_cloud_plot.png', dpi=300)
+    plt.close()
+        
+        #make_cross_plot(wac_df, clm_df)
 
 if __name__ == '__main__':
     main()
