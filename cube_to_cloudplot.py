@@ -21,7 +21,7 @@ from matplotlib.font_manager import FontProperties
 
 # on martini.local
 #source_dir = '/home/sbraden/lunar_rois/matching_cubes/'
-source_dir = '/home/sbraden/400mpp_coreg_wac_clm/'
+source_dir = '/home/sbraden/400mpp_immaturemare_6x6/'
 
 x1= 320
 x2= 415
