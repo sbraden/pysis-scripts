@@ -169,7 +169,7 @@ def main():
         #'/home/sbraden/400mpp_15x15_clm_wac/mare/',
         #'/home/sbraden/400mpp_15x15_clm_wac/pyro/',
         #'/home/sbraden/400mpp_15x15_clm_wac/imps/',
-        '/home/sbraden/mare_immature/'
+        '/home/sbraden/440mpp_15x15_clm_wac/mare_immature/'
         ]
 
     for directory in source_dirs:
@@ -188,7 +188,7 @@ def main():
     fontP.set_size('small')
     plt.legend(loc='upper left', fancybox=True, prop=fontP, scatterpoints=1)
     #plt.axis([0.65, 0.90, 0.95, 1.20],fontsize=14)
-    plt.axis([0.84, 0.96, 0.90, 1.20],fontsize=14)
+    #plt.axis([0.84, 0.96, 0.90, 1.20],fontsize=14)
     plt.xlabel('WAC 320/360 nm', fontsize=14)
     plt.ylabel('CLM 950/750 nm', fontsize=14)
     plt.savefig('lunar_roi_cloud_plot.png', dpi=300)
