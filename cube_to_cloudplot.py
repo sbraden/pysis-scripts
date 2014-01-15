@@ -169,7 +169,7 @@ def main():
         #'/home/sbraden/400mpp_15x15_clm_wac/mare/',
         #'/home/sbraden/400mpp_15x15_clm_wac/pyro/',
         #'/home/sbraden/400mpp_15x15_clm_wac/imps/',
-        '/home/sbraden/440mpp_15x15_clm_wac/mare_immature/'
+        '/home/sbraden/400mpp_15x15_clm_wac/mare_immature/'
         ]
 
     for directory in source_dirs:
