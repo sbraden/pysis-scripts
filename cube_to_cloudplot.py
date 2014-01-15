@@ -172,7 +172,7 @@ def main():
     source_dirs = [
 #        '/home/sbraden/400mpp_15x15_clm_wac/mare/',
 #         '/home/sbraden/400mpp_15x15_clm_wac/pyro/',
-        '/home/sbraden/400mpp_15x15_clm_wac/imps/'
+        '/home/sbraden/400mpp_15x15_clm_wac/imps/']
 #        ]
 
     for directory in source_dirs:
