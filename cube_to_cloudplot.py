@@ -69,9 +69,8 @@ def make_cloud_plot(image_list, color, groupname):
         xaxis = wac_320/wac_360
         yaxis = clm_950/clm_750
 
-        coloriter = colorloop.next()
-        #plt.scatter(xaxis, yaxis, marker='o', label=(roi_name), c=colorloop.next())
         plt.scatter(xaxis, yaxis, marker='.', label=(roi_name), c=color, edgecolor=color)
+        #coloriter = colorloop.next()
         #plt.scatter(xaxis, yaxis, marker='.', label=(roi_name), c=coloriter, edgecolor=coloriter)
 
 
