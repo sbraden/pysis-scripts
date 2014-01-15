@@ -69,7 +69,7 @@ def make_cloud_plot(image_list, color, groupname):
         yaxis = clm_950/clm_750
 
         #plt.scatter(xaxis, yaxis, marker='o', label=(roi_name), c=colorloop.next())
-        plt.scatter(xaxis, yaxis, marker='o', label=(groupname), c=color)
+        plt.scatter(xaxis, yaxis, marker='.', label=(groupname), c=color)
 
 
 def make_cross_plot(wac_df, clm_df):
@@ -186,7 +186,7 @@ def main():
 
     fontP = FontProperties()
     fontP.set_size('small')
-    plt.legend(loc='lower right', fancybox=True, prop=fontP, scatterpoints=1)
+    plt.legend(loc='lower left', fancybox=True, prop=fontP, scatterpoints=1)
     plt.xlabel('WAC 320/415 nm', fontsize=14)
     plt.ylabel('CLM 950/750 nm', fontsize=14)
     plt.savefig('lunar_roi_cloud_plot.png', dpi=300)
