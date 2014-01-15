@@ -187,6 +187,7 @@ def main():
     fontP = FontProperties()
     fontP.set_size('small')
     plt.legend(loc='lower left', fancybox=True, prop=fontP, scatterpoints=1)
+    plt.axis([0.65, 0.90, 0.85, 1.25],fontsize=14)
     plt.xlabel('WAC 320/415 nm', fontsize=14)
     plt.ylabel('CLM 950/750 nm', fontsize=14)
     plt.savefig('lunar_roi_cloud_plot.png', dpi=300)
