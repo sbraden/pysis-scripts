@@ -56,11 +56,11 @@ def make_cloud_plot(image_list, color, groupname):
     '''
     for img_name in image_list:
         roi_name = img_name[:-8]
-        image1 = CubeFile.open(source_dir+img_name) # pysis.cubefile.CubeFile
+        image1 = CubeFile.open(img_name) # pysis.cubefile.CubeFile
         wac_320 = image1.apply_numpy_specials()[0].T
         wac_360 = image1.apply_numpy_specials()[1].T
         wac_415 = image1.apply_numpy_specials()[2].T
-        image2 = CubeFile.open(source_dir+roi_name+'_clm.cub') # pysis.cubefile.CubeFile
+        image2 = CubeFile.open(roi_name+'_clm.cub') # pysis.cubefile.CubeFile
         clm_750 = image2.apply_numpy_specials()[1].T
         clm_950 = image2.apply_numpy_specials()[3].T
         clm_415 = image2.apply_numpy_specials()[0].T
