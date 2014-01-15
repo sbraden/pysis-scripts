@@ -55,7 +55,7 @@ def make_cloud_plot(image_list, color, groupname):
     Just pass one of the image_list
     '''
     for img_name in image_list:
-        roi_name = img_name[:-8]
+        roi_name = os.path.basename(img_name)[:-8]
         image1 = CubeFile.open(img_name) # pysis.cubefile.CubeFile
         wac_320 = image1.apply_numpy_specials()[0].T
         wac_360 = image1.apply_numpy_specials()[1].T
@@ -69,7 +69,8 @@ def make_cloud_plot(image_list, color, groupname):
         yaxis = clm_950/clm_750
 
         #plt.scatter(xaxis, yaxis, marker='o', label=(roi_name), c=colorloop.next())
-        plt.scatter(xaxis, yaxis, marker='.', label=(roi_name), c=color, edgecolor=color)
+        #plt.scatter(xaxis, yaxis, marker='.', label=(roi_name), c=color, edgecolor=color)
+        plt.scatter(xaxis, yaxis, marker='.', label=(roi_name), c=colorloop.next(), edgecolor=c)
 
 
 def make_cross_plot(wac_df, clm_df):
