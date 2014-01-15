@@ -20,9 +20,6 @@ from os.path import basename
 from matplotlib import pyplot as plt
 from matplotlib.font_manager import FontProperties
 
-# on martini.local
-#source_dir = '/home/sbraden/lunar_rois/matching_cubes/'
-#source_dir = '/home/sbraden/400mpp_immaturemare_6x6/'
 
 x1= 320
 x2= 415
@@ -69,9 +66,9 @@ def make_cloud_plot(image_list, color, groupname):
         xaxis = wac_320/wac_360
         yaxis = clm_950/clm_750
 
-        plt.scatter(xaxis, yaxis, marker='.', label=(roi_name), c=color, edgecolor=color)
-        #coloriter = colorloop.next()
-        #plt.scatter(xaxis, yaxis, marker='.', label=(roi_name), c=coloriter, edgecolor=coloriter)
+        #plt.scatter(xaxis, yaxis, marker='.', label=(roi_name), c=color, edgecolor=color)
+        coloriter = colorloop.next()
+        plt.scatter(xaxis, yaxis, marker='.', label=(roi_name), c=coloriter, edgecolor=coloriter)
 
 
 def make_cross_plot(wac_df, clm_df):
@@ -169,10 +166,10 @@ def main():
 
     # Write a part to put image directories into "groups"
     source_dirs = [
-        '/home/sbraden/400mpp_15x15_clm_wac/mare/',
-        '/home/sbraden/400mpp_15x15_clm_wac/pyro/',
-        '/home/sbraden/400mpp_15x15_clm_wac/imps/'
-        ]
+        '/home/sbraden/400mpp_15x15_clm_wac/mare/']#,
+        #'/home/sbraden/400mpp_15x15_clm_wac/pyro/',
+        #'/home/sbraden/400mpp_15x15_clm_wac/imps/'
+        #]
 
     for directory in source_dirs:
         
@@ -188,7 +185,7 @@ def main():
 
     fontP = FontProperties()
     fontP.set_size('small')
-    #plt.legend(loc='upper left', fancybox=True, prop=fontP, scatterpoints=1)
+    plt.legend(loc='upper left', fancybox=True, prop=fontP, scatterpoints=1)
     #plt.axis([0.65, 0.90, 0.95, 1.20],fontsize=14)
     plt.axis([0.84, 0.96, 0.90, 1.20],fontsize=14)
     plt.xlabel('WAC 320/360 nm', fontsize=14)
