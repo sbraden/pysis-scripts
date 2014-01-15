@@ -40,7 +40,7 @@ colors = [
   'green',
   'burlywood',
   'cyan',
-  'yellow',
+  'magenta',
   'black',
   'darkorange',
   'purple',
