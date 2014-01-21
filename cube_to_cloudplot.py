@@ -64,8 +64,8 @@ def make_cloud_plot(image_list, color, groupname):
         clm_950 = image2.apply_numpy_specials()[3].T
         clm_415 = image2.apply_numpy_specials()[0].T
 
-        xaxis = wac_415
-        yaxis = wac_415/wac_566
+        xaxis = wac_320/wac_415
+        yaxis = clm_950/clm_750
 
         plt.scatter(xaxis, yaxis, marker='.', label=(roi_name), c=color, edgecolor=color)
         #coloriter = colorloop.next()
@@ -199,9 +199,9 @@ def main():
     #plt.legend(loc='upper left', fancybox=True, prop=fontP, scatterpoints=1)
     #plt.axis([0.70, 0.86, 0.90, 1.15],fontsize=14)
     #plt.axis([0.84, 0.96, 0.90, 1.20],fontsize=14)
-    plt.margins(0.04) # 4% add "padding" to the data limits before they're autoscaled
-    plt.xlabel('WAC 415 nm', fontsize=14)
-    plt.ylabel('WAC 415/566 nm', fontsize=14)
+    plt.margins(0.02) # 2% add "padding" to the data limits before they're autoscaled
+    plt.xlabel('WAC 320/415 nm', fontsize=14)
+    plt.ylabel('CLM 950/750 nm', fontsize=14)
     plt.savefig('lunar_roi_cloud_plot.png', dpi=300)
     plt.close()
         
