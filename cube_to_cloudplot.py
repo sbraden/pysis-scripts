@@ -72,6 +72,15 @@ def make_cloud_plot(image_list, color, groupname):
         plt.scatter(xaxis, yaxis, marker='.', label=(roi_name), c=coloriter, edgecolor=coloriter)
 
 
+def forceAspect(ax,aspect=1): 
+    '''
+    From Stackoverflow
+    '''
+    im = ax.get_images()
+    extent =  im[0].get_extent()
+    ax.set_aspect(abs((extent[1]-extent[0])/(extent[3]-extent[2]))/aspect)
+
+
 def make_cross_plot(wac_df, clm_df):
     '''
     x = 320/415
@@ -190,6 +199,7 @@ def main():
     plt.legend(loc='upper left', fancybox=True, prop=fontP, scatterpoints=1)
     #plt.axis([0.70, 0.86, 0.90, 1.15],fontsize=14)
     #plt.axis([0.84, 0.96, 0.90, 1.20],fontsize=14)
+    plt.margins(0.04) # 4% add "padding" to the data limits before they're autoscaled
     plt.xlabel('WAC 415 nm', fontsize=14)
     plt.ylabel('WAC 415/566 nm', fontsize=14)
     plt.savefig('lunar_roi_cloud_plot.png', dpi=300)
