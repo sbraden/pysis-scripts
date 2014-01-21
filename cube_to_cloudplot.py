@@ -67,9 +67,9 @@ def make_cloud_plot(image_list, color, groupname):
         xaxis = wac_415
         yaxis = wac_415/wac_566
 
-        #plt.scatter(xaxis, yaxis, marker='.', label=(roi_name), c=color, edgecolor=color)
-        coloriter = colorloop.next()
-        plt.scatter(xaxis, yaxis, marker='.', label=(roi_name), c=coloriter, edgecolor=coloriter)
+        plt.scatter(xaxis, yaxis, marker='.', label=(roi_name), c=color, edgecolor=color)
+        #coloriter = colorloop.next()
+        #plt.scatter(xaxis, yaxis, marker='.', label=(roi_name), c=coloriter, edgecolor=coloriter)
 
 
 def forceAspect(ax,aspect=1): 
@@ -176,10 +176,10 @@ def main():
 
     # Write a part to put image directories into "groups"
     source_dirs = [
-        #'/home/sbraden/400mpp_15x15_clm_wac/mare/',
+        '/home/sbraden/400mpp_15x15_clm_wac/mare/',
         '/home/sbraden/400mpp_15x15_clm_wac/pyro/',
-        #'/home/sbraden/400mpp_15x15_clm_wac/imps/',
-        #'/home/sbraden/400mpp_15x15_clm_wac/mare_immature/'
+        '/home/sbraden/400mpp_15x15_clm_wac/imps/',
+        '/home/sbraden/400mpp_15x15_clm_wac/mare_immature/'
         ]
 
     for directory in source_dirs:
@@ -196,7 +196,7 @@ def main():
 
     fontP = FontProperties()
     fontP.set_size('small')
-    plt.legend(loc='upper left', fancybox=True, prop=fontP, scatterpoints=1)
+    #plt.legend(loc='upper left', fancybox=True, prop=fontP, scatterpoints=1)
     #plt.axis([0.70, 0.86, 0.90, 1.15],fontsize=14)
     #plt.axis([0.84, 0.96, 0.90, 1.20],fontsize=14)
     plt.margins(0.04) # 4% add "padding" to the data limits before they're autoscaled
