@@ -199,6 +199,7 @@ def main():
     #plt.legend(loc='upper left', fancybox=True, prop=fontP, scatterpoints=1)
     #plt.axis([0.70, 0.86, 0.90, 1.15],fontsize=14)
     plt.axis([0.65, 0.90, 0.90, 1.20],fontsize=14)
+    plt.axes().set_aspect('equal')
     plt.margins(0.02) # 2% add "padding" to the data limits before they're autoscaled
     plt.xlabel('WAC 320/415 nm', fontsize=14)
     plt.ylabel('CLM 950/750 nm', fontsize=14)
